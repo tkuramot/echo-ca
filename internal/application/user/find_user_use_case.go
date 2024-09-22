@@ -22,8 +22,8 @@ type FindUseCaseDto struct {
 	Nickname string
 }
 
-func (uc FindUserUseCase) Run(ctx context.Context, dto FindUseCaseDto) (*FindUseCaseDto, error) {
-	user, err := uc.userRepo.FindByID(ctx, dto.ID)
+func (uc FindUserUseCase) Run(ctx context.Context, id string) (*FindUseCaseDto, error) {
+	user, err := uc.userRepo.FindByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
