@@ -21,7 +21,7 @@ func (r *userRepository) FindByID(ctx context.Context, id string) (*user.User, e
 	u, err := query.UserFindById(ctx, id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errDomain.NotFountError
+			return nil, errDomain.NotFountErr
 		}
 		return nil, err
 	}

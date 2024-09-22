@@ -12,4 +12,4 @@ func NewError(description string) *Error {
 	return &Error{description: description}
 }
 
-var NotFountError = NewError("not found")
+var NotFountErr = NewError("not found")
