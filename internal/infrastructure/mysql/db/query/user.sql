@@ -6,7 +6,7 @@ FROM
 WHERE
     id = ?;
 
--- name: UpsertUser :exec
+-- name: UserUpsert :exec
 INSERT INTO
     users (
     id,

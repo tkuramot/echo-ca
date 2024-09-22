@@ -9,9 +9,9 @@ import (
 )
 
 type Querier interface {
-	UpsertUser(ctx context.Context, arg UpsertUserParams) error
 	UserFindAll(ctx context.Context) ([]User, error)
 	UserFindById(ctx context.Context, id string) (User, error)
+	UserUpsert(ctx context.Context, arg UserUpsertParams) error
 }
 
 var _ Querier = (*Queries)(nil)

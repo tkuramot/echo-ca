@@ -9,46 +9,6 @@ import (
 	"context"
 )
 
-const upsertUser = `-- name: UpsertUser :exec
-INSERT INTO
-    users (
-    id,
-    email,
-    nickname,
-    created_at,
-    updated_at
-)
-VALUES
-    (
-        ?,
-        ?,
-        ?,
-        NOW(),
-        NOW()
-    ) ON DUPLICATE KEY
-UPDATE
-    email = ?,
-    nickname = ?,
-    updated_at = NOW()
-`
-
-type UpsertUserParams struct {
-	ID       string `json:"id"`
-	Email    string `json:"email"`
-	Nickname string `json:"nickname"`
-}
-
-func (q *Queries) UpsertUser(ctx context.Context, arg UpsertUserParams) error {
-	_, err := q.db.ExecContext(ctx, upsertUser,
-		arg.ID,
-		arg.Email,
-		arg.Nickname,
-		arg.Email,
-		arg.Nickname,
-	)
-	return err
-}
-
 const userFindAll = `-- name: UserFindAll :many
 SELECT
     id, email, nickname, created_at, updated_at
@@ -105,4 +65,44 @@ func (q *Queries) UserFindById(ctx context.Context, id string) (User, error) {
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const userUpsert = `-- name: UserUpsert :exec
+INSERT INTO
+    users (
+    id,
+    email,
+    nickname,
+    created_at,
+    updated_at
+)
+VALUES
+    (
+        ?,
+        ?,
+        ?,
+        NOW(),
+        NOW()
+    ) ON DUPLICATE KEY
+UPDATE
+    email = ?,
+    nickname = ?,
+    updated_at = NOW()
+`
+
+type UserUpsertParams struct {
+	ID       string `json:"id"`
+	Email    string `json:"email"`
+	Nickname string `json:"nickname"`
+}
+
+func (q *Queries) UserUpsert(ctx context.Context, arg UserUpsertParams) error {
+	_, err := q.db.ExecContext(ctx, userUpsert,
+		arg.ID,
+		arg.Email,
+		arg.Nickname,
+		arg.Email,
+		arg.Nickname,
+	)
+	return err
 }
