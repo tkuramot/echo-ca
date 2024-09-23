@@ -1,0 +1,59 @@
+version: '3'
+
+vars:
+  DB_USER: ${DB_USER:-root}
+  DB_PASSWORD: ${DB_PASSWORD}
+  DB_HOST: ${DB_HOST:-db}
+  DB_NAME: ${DB_NAME:-echo_practice}
+
+tasks:
+  # Containers
+  build:
+    desc: Build containers
+    cmd: docker compose build
+
+  up:
+    desc: Start containers
+    cmd: docker compose up -d
+
+  down:
+    desc: Stop and remove containers
+    cmd: docker compose down
+
+  destroy:
+    desc: Destroy all containers, networks, images, and volumes
+    cmd: docker compose down --rmi all --volumes --remove-orphans
+
+  logs:
+    desc: Show logs
+    cmd: docker compose logs -f
+
+  # App
+  test:
+    desc: Run tests
+    cmd: go test ./...
+
+  lint:
+    desc: Run lint
+    cmd: go vet ./...
+
+  gen:
+    desc: Generate code
+    cmd: docker compose exec app sh -c "go generate ./..."
+
+  tidy:
+    desc: Tidy go modules
+    cmd: docker compose exec app sh -c "go mod tidy"
+
+  sqlc:
+    desc: Run sqlc in the container
+    cmd: docker compose exec app sh -c "sqlc {{.CLI_ARGS}}"
+
+  goose:
+    desc: Run goose in the container
+    cmd: docker compose exec app sh -c "goose -dir ./internal/infrastructure/mysql/db/migration {{.CLI_ARGS}}"
+
+  # Database
+  migrate-up:
+    desc: Run all available migrations
+    cmd: task goose -- mysql "{{.DB_USER}}:{{.DB_PASSWORD}}@tcp({{.DB_HOST}}:3306)/{{.DB_NAME}}" up

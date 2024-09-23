@@ -5,7 +5,6 @@
 //
 //	mockgen -package user -source user_repository.go -destination mock_user_repository.go
 //
-
 // Package user is a generated GoMock package.
 package user
 
