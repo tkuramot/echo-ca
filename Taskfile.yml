@@ -39,21 +39,19 @@ tasks:
 
   gen:
     desc: Generate code
-    cmd: docker compose exec app sh -c "go generate ./..."
+    cmd: docker compose exec app go generate ./...
 
   tidy:
     desc: Tidy go modules
-    cmd: docker compose exec app sh -c "go mod tidy"
+    cmd: docker compose exec app go mod tidy
 
   sqlc:
     desc: Run sqlc in the container
-    cmd: docker compose exec app sh -c "sqlc {{.CLI_ARGS}}"
+    cmd: docker compose exec app sqlc {{.CLI_ARGS}}
 
   goose:
     desc: Run goose in the container
-    cmd: docker compose exec app sh -c "goose -dir ./internal/infrastructure/mysql/db/migration {{.CLI_ARGS}}"
-
-  # Database
-  migrate-up:
-    desc: Run all available migrations
-    cmd: task goose -- mysql "{{.DB_USER}}:{{.DB_PASSWORD}}@tcp({{.DB_HOST}}:3306)/{{.DB_NAME}}" up
+    cmd: >
+      docker compose exec app
+      goose mysql "{{.DB_USER}}:{{.DB_PASSWORD}}@tcp({{.DB_HOST}}:3306)/{{.DB_NAME}}"
+      -dir ./internal/infrastructure/mysql/db/migration {{.CLI_ARGS}}
