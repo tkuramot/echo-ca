@@ -55,3 +55,13 @@ tasks:
       docker compose exec app
       goose mysql "{{.DB_USER}}:{{.DB_PASSWORD}}@tcp({{.DB_HOST}}:3306)/{{.DB_NAME}}"
       -dir ./internal/infrastructure/mysql/db/migration {{.CLI_ARGS}}
+
+  goose-seed:
+    deps:
+      - task: goose
+        vars:
+          CLI_ARGS: up
+    cmd: >
+      docker compose exec app
+      goose mysql "{{.DB_USER}}:{{.DB_PASSWORD}}@tcp({{.DB_HOST}}:3306)/{{.DB_NAME}}"
+      -dir ./internal/infrastructure/mysql/db/seed {{.CLI_ARGS}}
