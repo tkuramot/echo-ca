@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+
 	errDomain "github/tkuramot/echo-practice/internal/domain/error"
 	"github/tkuramot/echo-practice/internal/domain/user"
 	"github/tkuramot/echo-practice/internal/infrastructure/mysql/db"
@@ -12,7 +13,7 @@ import (
 
 type userRepository struct{}
 
-func NewUserRepository() user.UserRepository {
+func NewUserRepository() user.Repository {
 	return &userRepository{}
 }
 
@@ -43,7 +44,7 @@ func (r *userRepository) FindByEmail(ctx context.Context, email string) (*user.U
 	u, err := query.UserFindByEmail(ctx, email)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errDomain.NotFountErr
+			return nil, errDomain.ErrNotFound
 		}
 		return nil, err
 	}
@@ -64,7 +65,7 @@ func (r *userRepository) FindByID(ctx context.Context, id string) (*user.User, e
 	u, err := query.UserFindById(ctx, id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errDomain.NotFountErr
+			return nil, errDomain.ErrNotFound
 		}
 		return nil, err
 	}

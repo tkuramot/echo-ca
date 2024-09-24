@@ -7,10 +7,10 @@ import (
 )
 
 type FindUserUseCase struct {
-	userRepo userDomain.UserRepository
+	userRepo userDomain.Repository
 }
 
-func NewFindUserUseCase(userRepo userDomain.UserRepository) *FindUserUseCase {
+func NewFindUserUseCase(userRepo userDomain.Repository) *FindUserUseCase {
 	return &FindUserUseCase{
 		userRepo: userRepo,
 	}

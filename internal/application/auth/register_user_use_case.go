@@ -2,15 +2,16 @@ package auth
 
 import (
 	"context"
+
 	userDomain "github/tkuramot/echo-practice/internal/domain/user"
 )
 
 type RegisterUserUseCase struct {
-	userRepo userDomain.UserRepository
+	userRepo userDomain.Repository
 }
 
 func NewRegisterUserUseCase(
-	userRepo userDomain.UserRepository,
+	userRepo userDomain.Repository,
 ) *RegisterUserUseCase {
 	return &RegisterUserUseCase{
 		userRepo: userRepo,

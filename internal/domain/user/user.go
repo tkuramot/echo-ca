@@ -1,6 +1,7 @@
 package user
 
 import (
+	"fmt"
 	"net/mail"
 	"regexp"
 	"unicode/utf8"
@@ -23,12 +24,14 @@ const (
 	passwordLengthMin = 8
 )
 
+var ErrDuplicateUser = errDomain.NewError("ニックネームもしくはメールアドレスが既に登録されています。")
+
 func Reconstruct(id, email, nickname, passwordDigest string) (*User, error) {
 	return newUser(id, email, nickname, passwordDigest)
 }
 
 func NewUser(email, nickname, password string) (*User, error) {
-	re := regexp.MustCompile(`^[\x21-\x7E]{8,}$`) // ASCII文字で8文字以上
+	re := regexp.MustCompile(fmt.Sprintf(`^[\x21-\x7E]{%d,}$`, passwordLengthMin)) // ASCII文字で8文字以上	hasLower := regexp.MustCompile(`[a-z]`).MatchString(password)
 	hasLower := regexp.MustCompile(`[a-z]`).MatchString(password)
 	hasUpper := regexp.MustCompile(`[A-Z]`).MatchString(password)
 	hasDigit := regexp.MustCompile(`\d`).MatchString(password)

@@ -12,4 +12,4 @@ func NewError(description string) *Error {
 	return &Error{description: description}
 }
 
-var NotFountErr = NewError("not found")
+var ErrNotFound = NewError("対象のデータが存在しませんでした。")

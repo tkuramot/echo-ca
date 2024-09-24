@@ -16,7 +16,7 @@ func ErrorHandler(next echo.HandlerFunc) echo.HandlerFunc {
 		var domainErr *errDomain.Error
 		if errors.As(err, &domainErr) {
 			switch {
-			case errors.Is(domainErr, errDomain.NotFountErr):
+			case errors.Is(domainErr, errDomain.ErrNotFound):
 				return ReturnStatusNotFound(c, domainErr)
 			default:
 				return ReturnStatusBadRequest(c, domainErr)
