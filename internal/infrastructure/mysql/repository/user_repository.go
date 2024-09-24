@@ -82,7 +82,7 @@ func (r *userRepository) FindByID(ctx context.Context, id string) (*user.User, e
 
 func (r *userRepository) Save(ctx context.Context, u *user.User) error {
 	query := db.GetQuery(ctx)
-	if err := query.UserUpsert(ctx, dbgen.UserUpsertParams{
+	if err := query.UserInsert(ctx, dbgen.UserInsertParams{
 		ID:             u.ID(),
 		Email:          u.Email(),
 		Nickname:       u.Nickname(),

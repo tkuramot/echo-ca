@@ -92,6 +92,43 @@ func (q *Queries) UserFindById(ctx context.Context, id string) (User, error) {
 	return i, err
 }
 
+const userInsert = `-- name: UserInsert :exec
+INSERT INTO
+    users (
+    id,
+    email,
+    nickname,
+    password_digest,
+    created_at,
+    updated_at
+)
+VALUES (
+    ?,
+    ?,
+    ?,
+    ?,
+    NOW(),
+    NOW()
+)
+`
+
+type UserInsertParams struct {
+	ID             string `json:"id"`
+	Email          string `json:"email"`
+	Nickname       string `json:"nickname"`
+	PasswordDigest string `json:"password_digest"`
+}
+
+func (q *Queries) UserInsert(ctx context.Context, arg UserInsertParams) error {
+	_, err := q.db.ExecContext(ctx, userInsert,
+		arg.ID,
+		arg.Email,
+		arg.Nickname,
+		arg.PasswordDigest,
+	)
+	return err
+}
+
 const userUpsert = `-- name: UserUpsert :exec
 INSERT INTO
     users (
@@ -102,15 +139,14 @@ INSERT INTO
     created_at,
     updated_at
 )
-VALUES
-    (
-        ?,
-        ?,
-        ?,
-        ?,
-        NOW(),
-        NOW()
-    ) ON DUPLICATE KEY
+VALUES (
+    ?,
+    ?,
+    ?,
+    ?,
+    NOW(),
+    NOW()
+) ON DUPLICATE KEY
 UPDATE
     email = ?,
     nickname = ?,

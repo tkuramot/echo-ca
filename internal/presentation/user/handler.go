@@ -2,22 +2,20 @@ package user
 
 import (
 	"github.com/labstack/echo/v4"
+
 	userApp "github/tkuramot/echo-practice/internal/application/user"
 	"github/tkuramot/echo-practice/internal/presentation/settings"
 )
 
 type handler struct {
 	findUserUseCase *userApp.FindUserUseCase
-	saveUserUseCase *userApp.SaveUserUseCase
 }
 
 func NewHandler(
 	findUserUseCase *userApp.FindUserUseCase,
-	saveUserUseCase *userApp.SaveUserUseCase,
 ) *handler {
 	return &handler{
 		findUserUseCase: findUserUseCase,
-		saveUserUseCase: saveUserUseCase,
 	}
 }
 
