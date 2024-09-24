@@ -2,45 +2,62 @@ package user
 
 import (
 	"net/mail"
+	"regexp"
 	"unicode/utf8"
 
-	"github/tkuramot/echo-practice/pkg/ulid"
-
 	errDomain "github/tkuramot/echo-practice/internal/domain/error"
+	pwd "github/tkuramot/echo-practice/pkg/password"
+	"github/tkuramot/echo-practice/pkg/ulid"
 )
 
 type User struct {
-	id       string
-	email    string
-	nickname string
+	id             string
+	email          string
+	nickname       string
+	passwordDigest string
 }
 
 const (
-	nameLengthMin = 3
-	nameLengthMax = 255
+	nameLengthMin     = 2
+	nameLengthMax     = 255
+	passwordLengthMin = 8
 )
 
-func Reconstruct(id, email, nickname string) (*User, error) {
-	return newUser(id, email, nickname)
+func Reconstruct(id, email, nickname, passwordDigest string) (*User, error) {
+	return newUser(id, email, nickname, passwordDigest)
 }
 
-func NewUser(email, nickname string) (*User, error) {
-	return newUser(ulid.NewULID(), email, nickname)
+func NewUser(email, nickname, password string) (*User, error) {
+	re := regexp.MustCompile(`^[\x21-\x7E]{8,}$`) // ASCII文字で8文字以上
+	hasLower := regexp.MustCompile(`[a-z]`).MatchString(password)
+	hasUpper := regexp.MustCompile(`[A-Z]`).MatchString(password)
+	hasDigit := regexp.MustCompile(`\d`).MatchString(password)
+	hasSpecial := regexp.MustCompile(`[\W_]`).MatchString(password) // 特殊文字
+	if !re.MatchString(password) || !hasLower || !hasUpper || !hasDigit || !hasSpecial {
+		return nil, errDomain.NewError("パスワードは8文字以上、大文字・小文字・数字・特殊文字を含む必要があります。")
+	}
+
+	passwordDigest, err := pwd.Hash(password)
+	if err != nil {
+		return nil, err
+	}
+	return newUser(ulid.NewULID(), email, nickname, passwordDigest)
 }
 
-func newUser(id, email, nickname string) (*User, error) {
+func newUser(id, email, nickname, passwordDigest string) (*User, error) {
 	if utf8.RuneCountInString(nickname) < nameLengthMin || utf8.RuneCountInString(nickname) > nameLengthMax {
-		return nil, errDomain.NewError("nickname value is invalid")
+		return nil, errDomain.NewError("ニックネームは2文字以上、255文字以下で入力してください。")
 	}
 
 	if _, err := mail.ParseAddress(email); err != nil {
-		return nil, errDomain.NewError("email value is invalid")
+		return nil, errDomain.NewError("メールアドレスが無効な形式です。")
 	}
 
 	return &User{
-		id:       id,
-		email:    email,
-		nickname: nickname,
+		id:             id,
+		email:          email,
+		nickname:       nickname,
+		passwordDigest: passwordDigest,
 	}, nil
 }
 
@@ -54,4 +71,12 @@ func (u *User) Email() string {
 
 func (u *User) Nickname() string {
 	return u.nickname
+}
+
+func (u *User) PasswordDigest() string {
+	return u.passwordDigest
+}
+
+func (u *User) Authenticate(password string) error {
+	return pwd.Verify(password, u.passwordDigest)
 }

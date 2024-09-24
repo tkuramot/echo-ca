@@ -11,7 +11,7 @@ import (
 
 const userFindAll = `-- name: UserFindAll :many
 SELECT
-    id, email, nickname, created_at, updated_at
+    id, email, nickname, created_at, updated_at, password_digest
 FROM
     users
 `
@@ -31,6 +31,7 @@ func (q *Queries) UserFindAll(ctx context.Context) ([]User, error) {
 			&i.Nickname,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.PasswordDigest,
 		); err != nil {
 			return nil, err
 		}
@@ -45,9 +46,32 @@ func (q *Queries) UserFindAll(ctx context.Context) ([]User, error) {
 	return items, nil
 }
 
+const userFindByEmail = `-- name: UserFindByEmail :one
+SELECT
+    id, email, nickname, created_at, updated_at, password_digest
+FROM
+    users
+WHERE
+    email = ?
+`
+
+func (q *Queries) UserFindByEmail(ctx context.Context, email string) (User, error) {
+	row := q.db.QueryRowContext(ctx, userFindByEmail, email)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Nickname,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.PasswordDigest,
+	)
+	return i, err
+}
+
 const userFindById = `-- name: UserFindById :one
 SELECT
-    id, email, nickname, created_at, updated_at
+    id, email, nickname, created_at, updated_at, password_digest
 FROM
     users
 WHERE
@@ -63,6 +87,7 @@ func (q *Queries) UserFindById(ctx context.Context, id string) (User, error) {
 		&i.Nickname,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.PasswordDigest,
 	)
 	return i, err
 }
@@ -73,11 +98,13 @@ INSERT INTO
     id,
     email,
     nickname,
+    password_digest,
     created_at,
     updated_at
 )
 VALUES
     (
+        ?,
         ?,
         ?,
         ?,
@@ -87,13 +114,15 @@ VALUES
 UPDATE
     email = ?,
     nickname = ?,
+    password_digest = ?,
     updated_at = NOW()
 `
 
 type UserUpsertParams struct {
-	ID       string `json:"id"`
-	Email    string `json:"email"`
-	Nickname string `json:"nickname"`
+	ID             string `json:"id"`
+	Email          string `json:"email"`
+	Nickname       string `json:"nickname"`
+	PasswordDigest string `json:"password_digest"`
 }
 
 func (q *Queries) UserUpsert(ctx context.Context, arg UserUpsertParams) error {
@@ -101,8 +130,10 @@ func (q *Queries) UserUpsert(ctx context.Context, arg UserUpsertParams) error {
 		arg.ID,
 		arg.Email,
 		arg.Nickname,
+		arg.PasswordDigest,
 		arg.Email,
 		arg.Nickname,
+		arg.PasswordDigest,
 	)
 	return err
 }

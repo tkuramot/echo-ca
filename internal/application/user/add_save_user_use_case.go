@@ -17,10 +17,11 @@ func NewSaveUserUseCase(userRepo userDomain.UserRepository) *SaveUserUseCase {
 type SaveUserUseCaseDto struct {
 	Email    string
 	Nickname string
+	Password string
 }
 
 func (uc *SaveUserUseCase) Run(ctx context.Context, dto SaveUserUseCaseDto) error {
-	user, err := userDomain.NewUser(dto.Email, dto.Nickname)
+	user, err := userDomain.NewUser(dto.Email, dto.Nickname, dto.Password)
 	if err != nil {
 		return err
 	}
