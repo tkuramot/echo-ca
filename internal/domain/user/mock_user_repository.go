@@ -5,6 +5,7 @@
 //
 //	mockgen -package user -source user_repository.go -destination mock_user_repository.go
 //
+
 // Package user is a generated GoMock package.
 package user
 
@@ -51,6 +52,21 @@ func (m *MockUserRepository) FindAll(ctx context.Context) ([]*User, error) {
 func (mr *MockUserRepositoryMockRecorder) FindAll(ctx any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAll", reflect.TypeOf((*MockUserRepository)(nil).FindAll), ctx)
+}
+
+// FindByEmail mocks base method.
+func (m *MockUserRepository) FindByEmail(ctx context.Context, email string) (*User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindByEmail", ctx, email)
+	ret0, _ := ret[0].(*User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindByEmail indicates an expected call of FindByEmail.
+func (mr *MockUserRepositoryMockRecorder) FindByEmail(ctx, email any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByEmail", reflect.TypeOf((*MockUserRepository)(nil).FindByEmail), ctx, email)
 }
 
 // FindByID mocks base method.

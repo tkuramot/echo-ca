@@ -34,6 +34,7 @@ func TestFindUserUseCase_Run(t *testing.T) {
 							id,
 							"test@example.com",
 							"test",
+							"password_digest",
 						)
 					})
 			},
@@ -54,7 +55,8 @@ func TestFindUserUseCase_Run(t *testing.T) {
 				t.Errorf("FindUserUseCase.Run() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if diff := cmp.Diff(got, tt.want); diff != "" {
+			diff := cmp.Diff(got, tt.want)
+			if diff != "" {
 				t.Errorf("Run() mismatch (-want +got):\n%s", diff)
 			}
 		})
@@ -65,11 +67,13 @@ func reconstructUser(
 	id string,
 	email string,
 	nickname string,
+	passwordDigest string,
 ) (*userDomain.User, error) {
 	user, err := userDomain.Reconstruct(
 		id,
 		email,
 		nickname,
+		passwordDigest,
 	)
 	if err != nil {
 		return nil, err
