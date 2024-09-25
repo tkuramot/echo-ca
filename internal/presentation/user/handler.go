@@ -7,19 +7,19 @@ import (
 	"github/tkuramot/echo-practice/internal/presentation/settings"
 )
 
-type handler struct {
+type Handler struct {
 	findUserUseCase *userApp.FindUserUseCase
 }
 
 func NewHandler(
 	findUserUseCase *userApp.FindUserUseCase,
-) *handler {
-	return &handler{
+) *Handler {
+	return &Handler{
 		findUserUseCase: findUserUseCase,
 	}
 }
 
-func (h *handler) GetUserByID(c echo.Context) error {
+func (h *Handler) GetUserByID(c echo.Context) error {
 	ctx := c.Request().Context()
 	id := c.Param("id")
 	dto, err := h.findUserUseCase.Run(ctx, id)

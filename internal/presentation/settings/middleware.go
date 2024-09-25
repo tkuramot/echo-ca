@@ -6,7 +6,7 @@ import (
 	errDomain "github/tkuramot/echo-practice/internal/domain/error"
 )
 
-func ErrorHandler(next echo.HandlerFunc) echo.HandlerFunc {
+func errorHandler(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		err := next(c)
 		if err == nil {

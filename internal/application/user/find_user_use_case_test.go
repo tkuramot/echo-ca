@@ -19,7 +19,7 @@ func TestFindUserUseCase_Run(t *testing.T) {
 		name     string
 		id       string
 		mockFunc func()
-		want     *FindUseCaseDto
+		want     *FindUserUseCaseOutputDto
 		wantErr  bool
 	}{
 		{
@@ -38,7 +38,7 @@ func TestFindUserUseCase_Run(t *testing.T) {
 						)
 					})
 			},
-			want: &FindUseCaseDto{
+			want: &FindUserUseCaseOutputDto{
 				ID:       "0123456789",
 				Email:    "test@example.com",
 				Nickname: "test",

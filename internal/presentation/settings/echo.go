@@ -1,6 +1,8 @@
 package settings
 
 import (
+	"github.com/gorilla/sessions"
+	"github.com/labstack/echo-contrib/session"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -9,7 +11,14 @@ import (
 
 func NewEcho() *echo.Echo {
 	e := echo.New()
+
 	e.Use(middleware.CORS())
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+	// TODO secret key
+	e.Use(session.Middleware(sessions.NewCookieStore([]byte("secret"))))
+	e.Use(errorHandler)
+
 	return e
 }
 
@@ -19,10 +28,6 @@ func ReturnStatusOK[T any](c echo.Context, body T) error {
 
 func ReturnStatusCreated[T any](c echo.Context, body T) error {
 	return c.JSON(http.StatusCreated, &body)
-}
-
-func ReturnStatusNoContent(c echo.Context) error {
-	return c.JSON(http.StatusNoContent, nil)
 }
 
 func ReturnStatusBadRequest(c echo.Context, err error) error {

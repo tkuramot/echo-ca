@@ -12,6 +12,8 @@ services:
       - db-store:/var/lib/mysql
     networks:
       - echo-practice-network
+    ports:
+      - "3306:3306"
     environment:
       MYSQL_DATABASE: echo_practice
       TZ: Asia/Tokyo

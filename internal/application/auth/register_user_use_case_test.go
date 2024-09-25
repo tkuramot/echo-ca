@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"go.uber.org/mock/gomock"
 	"testing"
 
@@ -16,14 +17,14 @@ func TestRegisterUserUseCase_Run(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		dto      RegisterUserUseCaseDto
+		dto      RegisterUserUseCaseInputDto
 		mockFunc func()
-		want     *userDomain.User
+		want     *RegisterUserUseCaseOutputDto
 		wantErr  bool
 	}{
 		{
 			name: "register user and return user",
-			dto: RegisterUserUseCaseDto{
+			dto: RegisterUserUseCaseInputDto{
 				Email:    "test@example.com",
 				Nickname: "test",
 				Password: "P4ssw0rd!",
@@ -33,24 +34,12 @@ func TestRegisterUserUseCase_Run(t *testing.T) {
 					EXPECT().
 					Save(gomock.Any(), gomock.Any()).
 					Return(nil)
-				mockUserRepo.
-					EXPECT().
-					FindByEmail(gomock.Any(), gomock.Any()).
-					DoAndReturn(func(ctx context.Context, email string) (*userDomain.User, error) {
-						return reconstructUser(
-							"0123456789",
-							"test@example.com",
-							"test",
-							"password_digest",
-						), nil
-					})
 			},
-			want: reconstructUser(
-				"0123456789",
-				"test@example.com",
-				"test",
-				"password_digest",
-			),
+			want: &RegisterUserUseCaseOutputDto{
+				ID:       "whatever",
+				Email:    "test@example.com",
+				Nickname: "test",
+			},
 			wantErr: false,
 		},
 	}
@@ -66,26 +55,11 @@ func TestRegisterUserUseCase_Run(t *testing.T) {
 			diff := cmp.Diff(
 				got,
 				tt.want,
-				cmp.AllowUnexported(userDomain.User{}),
+				cmpopts.IgnoreFields(RegisterUserUseCaseOutputDto{}, "ID"),
 			)
 			if diff != "" {
 				t.Errorf("Run() mismatch (-want +got):\n%s", diff)
 			}
 		})
 	}
-}
-
-func reconstructUser(
-	id string,
-	email string,
-	nickname string,
-	passwordDigest string,
-) *userDomain.User {
-	user, _ := userDomain.Reconstruct(
-		id,
-		email,
-		nickname,
-		passwordDigest,
-	)
-	return user
 }
