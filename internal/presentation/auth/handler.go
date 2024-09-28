@@ -6,7 +6,6 @@ import (
 	"github.com/labstack/echo/v4"
 	authApp "github/tkuramot/echo-practice/internal/application/auth"
 	"github/tkuramot/echo-practice/internal/presentation/settings"
-	"net/http"
 )
 
 type Handler struct {
@@ -68,14 +67,21 @@ func (h *Handler) LoginUser(c echo.Context) error {
 		return settings.ReturnStatusUnauthorized(c, err)
 	}
 
-	sess, err := session.Get(user.ID, c)
+	sess, err := session.Get(settings.SessionKey, c)
 	sess.Options = &sessions.Options{
 		Path:     "/",
 		MaxAge:   86400 * 7,
 		HttpOnly: true,
 	}
+	sess.Values[settings.SessionUserIDKey] = user.ID
 	if err := sess.Save(c.Request(), c.Response()); err != nil {
 		return settings.ReturnStatusInternalServerError(c, err)
 	}
-	return c.NoContent(http.StatusOK)
+	return settings.ReturnStatusOK(c, loginUserResponse{
+		User: userResponseModel{
+			ID:       user.ID,
+			Email:    user.Email,
+			Nickname: user.Nickname,
+		},
+	})
 }

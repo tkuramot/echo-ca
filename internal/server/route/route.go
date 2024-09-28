@@ -1,7 +1,10 @@
 package route
 
 import (
+	"fmt"
+	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
+	"github/tkuramot/echo-practice/internal/presentation/settings"
 
 	authApp "github/tkuramot/echo-practice/internal/application/auth"
 	userApp "github/tkuramot/echo-practice/internal/application/user"
@@ -30,6 +33,13 @@ func authRoute(g *echo.Group) {
 	group := g.Group("/auth")
 	group.POST("/register", h.RegisterUser)
 	group.POST("/login", h.LoginUser)
+	group.GET("/session", func(c echo.Context) error {
+		sess, err := session.Get(settings.SessionKey, c)
+		if err != nil {
+			return err
+		}
+		return c.String(200, fmt.Sprintf("session: %v", sess.Values["user_id"]))
+	})
 }
 
 func userRoute(g *echo.Group) {

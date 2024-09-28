@@ -9,3 +9,7 @@ type userResponseModel struct {
 type registerUserResponse struct {
 	User userResponseModel `json:"user"`
 }
+
+type loginUserResponse struct {
+	User userResponseModel `json:"user"`
+}

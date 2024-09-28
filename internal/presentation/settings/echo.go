@@ -9,6 +9,11 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
+const (
+	SessionKey       = "session_id"
+	SessionUserIDKey = "user_id"
+)
+
 func NewEcho() *echo.Echo {
 	e := echo.New()
 
