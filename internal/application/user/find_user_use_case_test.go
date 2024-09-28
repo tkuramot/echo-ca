@@ -12,7 +12,7 @@ import (
 
 func TestFindUserUseCase_Run(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	mockUserRepo := userDomain.NewMockUserRepository(ctrl)
+	mockUserRepo := userDomain.NewMockRepository(ctrl)
 	uc := NewFindUserUseCase(mockUserRepo)
 
 	tests := []struct {
@@ -28,7 +28,7 @@ func TestFindUserUseCase_Run(t *testing.T) {
 			mockFunc: func() {
 				mockUserRepo.
 					EXPECT().
-					FindByID(gomock.Any(), gomock.Any()).
+					FindByID(gomock.Any(), "0123456789").
 					DoAndReturn(func(ctx context.Context, id string) (*userDomain.User, error) {
 						return reconstructUser(
 							id,

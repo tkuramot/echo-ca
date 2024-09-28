@@ -81,5 +81,9 @@ func (u *User) PasswordDigest() string {
 }
 
 func (u *User) Authenticate(password string) error {
-	return pwd.Verify(password, u.passwordDigest)
+	err := pwd.Verify(password, u.passwordDigest)
+	if err != nil {
+		return errDomain.NewError("無効な認証情報です。")
+	}
+	return nil
 }

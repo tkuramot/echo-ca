@@ -4,6 +4,7 @@ import (
 	"github.com/labstack/echo/v4"
 
 	authApp "github/tkuramot/echo-practice/internal/application/auth"
+	sessionApp "github/tkuramot/echo-practice/internal/application/session"
 	userApp "github/tkuramot/echo-practice/internal/application/user"
 	"github/tkuramot/echo-practice/internal/infrastructure/mysql/repository"
 	authPre "github/tkuramot/echo-practice/internal/presentation/auth"
@@ -32,6 +33,7 @@ func authRoute(g *echo.Group) {
 	h := authPre.NewHandler(
 		authApp.NewRegisterUserUseCase(userRepo),
 		authApp.NewLoginUserUseCase(userRepo),
+		sessionApp.NewCreateSessionUseCase(),
 	)
 	group := g.Group("/auth")
 	group.POST("/register", h.RegisterUser)
@@ -43,6 +45,7 @@ func protectedAuthRoute(g *echo.Group) {
 	h := authPre.NewHandler(
 		authApp.NewRegisterUserUseCase(userRepo),
 		authApp.NewLoginUserUseCase(userRepo),
+		sessionApp.NewCreateSessionUseCase(),
 	)
 	group := g.Group("/auth")
 	group.POST("/logout", h.LogoutUser)

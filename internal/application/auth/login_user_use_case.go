@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+
 	userDomain "github/tkuramot/echo-practice/internal/domain/user"
 )
 

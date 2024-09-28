@@ -15,7 +15,7 @@ import (
 
 func TestLoginUserUseCase_Run(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	mockUserRepo := user.NewMockUserRepository(ctrl)
+	mockUserRepo := user.NewMockRepository(ctrl)
 	uc := NewLoginUserUseCase(mockUserRepo)
 
 	tests := []struct {

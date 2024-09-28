@@ -7,21 +7,26 @@ import (
 	"net/http"
 
 	authApp "github/tkuramot/echo-practice/internal/application/auth"
+	sessionApp "github/tkuramot/echo-practice/internal/application/session"
+	echoRepo "github/tkuramot/echo-practice/internal/infrastructure/echo/repository"
 	"github/tkuramot/echo-practice/internal/presentation/settings"
 )
 
 type Handler struct {
-	registerUserUseCase *authApp.RegisterUserUseCase
-	loginUserUseCase    *authApp.LoginUserUseCase
+	registerUserUseCase  *authApp.RegisterUserUseCase
+	loginUserUseCase     *authApp.LoginUserUseCase
+	createSessionUseCase *sessionApp.CreateSessionUseCase
 }
 
 func NewHandler(
 	registerUserUseCase *authApp.RegisterUserUseCase,
 	loginUserUseCase *authApp.LoginUserUseCase,
+	createSessionUseCase *sessionApp.CreateSessionUseCase,
 ) *Handler {
 	return &Handler{
-		registerUserUseCase: registerUserUseCase,
-		loginUserUseCase:    loginUserUseCase,
+		registerUserUseCase:  registerUserUseCase,
+		loginUserUseCase:     loginUserUseCase,
+		createSessionUseCase: createSessionUseCase,
 	}
 }
 
@@ -69,14 +74,12 @@ func (h *Handler) LoginUser(c echo.Context) error {
 		return settings.ReturnStatusUnauthorized(c, err)
 	}
 
-	sess, err := session.Get(settings.SessionKey, c)
-	sess.Options = &sessions.Options{
-		Path:     "/",
-		MaxAge:   86400 * 7,
-		HttpOnly: true,
-	}
-	sess.Values[settings.SessionUserIDKey] = user.ID
-	if err := sess.Save(c.Request(), c.Response()); err != nil {
+	sessionRepo := echoRepo.NewSessionRepository(c)
+	err = h.createSessionUseCase.Run(sessionRepo, sessionApp.CreateSessionUseCaseInputDto{
+		IsAuthenticated: true,
+		UserID:          user.ID,
+	})
+	if err != nil {
 		return settings.ReturnStatusInternalServerError(c, err)
 	}
 	return settings.ReturnStatusOK(c, loginUserResponse{

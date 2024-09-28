@@ -12,7 +12,7 @@ import (
 
 func TestRegisterUserUseCase_Run(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	mockUserRepo := userDomain.NewMockUserRepository(ctrl)
+	mockUserRepo := userDomain.NewMockRepository(ctrl)
 	uc := NewRegisterUserUseCase(mockUserRepo)
 
 	tests := []struct {
