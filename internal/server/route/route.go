@@ -22,6 +22,7 @@ func InitRoute(e *echo.Echo) {
 	protectedV1 := e.Group("/v1")
 	protectedV1.Use(settings.AuthMiddleware)
 	{
+		protectedAuthRoute(protectedV1)
 		protectedUserRoute(protectedV1)
 	}
 }
@@ -35,6 +36,16 @@ func authRoute(g *echo.Group) {
 	group := g.Group("/auth")
 	group.POST("/register", h.RegisterUser)
 	group.POST("/login", h.LoginUser)
+}
+
+func protectedAuthRoute(g *echo.Group) {
+	userRepo := repository.NewUserRepository()
+	h := authPre.NewHandler(
+		authApp.NewRegisterUserUseCase(userRepo),
+		authApp.NewLoginUserUseCase(userRepo),
+	)
+	group := g.Group("/auth")
+	group.POST("/logout", h.LogoutUser)
 }
 
 func protectedUserRoute(g *echo.Group) {

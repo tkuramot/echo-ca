@@ -4,6 +4,7 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
+	"net/http"
 
 	authApp "github/tkuramot/echo-practice/internal/application/auth"
 	"github/tkuramot/echo-practice/internal/presentation/settings"
@@ -85,4 +86,20 @@ func (h *Handler) LoginUser(c echo.Context) error {
 			Nickname: user.Nickname,
 		},
 	})
+}
+
+func (h *Handler) LogoutUser(c echo.Context) error {
+	sess, err := session.Get(settings.SessionKey, c)
+	if err != nil {
+		return settings.ReturnStatusInternalServerError(c, err)
+	}
+	sess.Options = &sessions.Options{
+		Path:     "/",
+		MaxAge:   -1,
+		HttpOnly: true,
+	}
+	if err := sess.Save(c.Request(), c.Response()); err != nil {
+		return settings.ReturnStatusInternalServerError(c, err)
+	}
+	return c.NoContent(http.StatusOK)
 }
