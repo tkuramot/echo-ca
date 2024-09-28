@@ -22,7 +22,7 @@ func NewEcho() *echo.Echo {
 	e.Use(middleware.Recover())
 	// TODO secret key
 	e.Use(session.Middleware(sessions.NewCookieStore([]byte("secret"))))
-	e.Use(errorHandler)
+	e.Use(errorMiddleware)
 
 	return e
 }
