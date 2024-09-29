@@ -1,8 +1,6 @@
 package session
 
-import (
-	errDomain "github/tkuramot/echo-practice/internal/domain/error"
-)
+import errDomain "github/tkuramot/echo-practice/internal/domain/error"
 
 type Session struct {
 	isAuthenticated bool
@@ -17,7 +15,10 @@ const (
 	KeyRememberMe      = "remember_me"
 )
 
-var ErrInvalidSession = errDomain.NewError("無効なセッションです。")
+var ErrInvalidSession = errDomain.NewError(
+	errDomain.Unauthorized,
+	"無効なセッションです",
+)
 
 func NewSession(userID string, isAuthenticated, rememberMe bool) *Session {
 	return &Session{

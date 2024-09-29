@@ -72,6 +72,7 @@ func (r *SessionRepository) Save(s *sessionDomain.Session) error {
 	}
 	sess.Values[sessionDomain.KeyUserID] = s.UserID()
 	sess.Values[sessionDomain.KeyIsAuthenticated] = s.IsAuthenticated()
+	sess.Values[sessionDomain.KeyRememberMe] = s.RememberMe()
 	return sess.Save(r.ctx.Request(), r.ctx.Response())
 }
 
@@ -85,9 +86,6 @@ func (r *SessionRepository) Verify() error {
 		return sessionDomain.ErrInvalidSession
 	}
 	if _, ok := sess.Values[sessionDomain.KeyIsAuthenticated]; !ok {
-		return sessionDomain.ErrInvalidSession
-	}
-	if _, ok := sess.Values[sessionDomain.KeyRememberMe]; !ok {
 		return sessionDomain.ErrInvalidSession
 	}
 	return nil

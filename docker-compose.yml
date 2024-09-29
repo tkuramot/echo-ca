@@ -8,6 +8,7 @@ services:
   db:
     container_name: db
     image: mysql:8.0.35-debian
+    restart: on-failure
     volumes:
       - db-store:/var/lib/mysql
     networks:
@@ -27,6 +28,7 @@ services:
     build:
       context: .
       dockerfile: ./build/Dockerfile
+    restart: on-failure
     networks:
       - echo-practice-network
     ports:

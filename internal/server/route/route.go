@@ -55,7 +55,7 @@ func userRoute(g *echo.Group) {
 		userApp.NewRegisterUserUseCase(userRepo),
 	)
 	group := g.Group("/users")
-	group.POST("/", h.RegisterUser)
+	group.POST("", h.RegisterUser)
 }
 
 func protectedUserRoute(g *echo.Group) {

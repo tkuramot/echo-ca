@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"github.com/go-sql-driver/mysql"
 
-	errDomain "github/tkuramot/echo-practice/internal/domain/error"
 	"github/tkuramot/echo-practice/internal/domain/user"
 	"github/tkuramot/echo-practice/internal/infrastructure/mysql/db"
 	"github/tkuramot/echo-practice/internal/infrastructure/mysql/db/dbgen"
@@ -44,7 +44,7 @@ func (r *userRepository) FindByEmail(ctx context.Context, email string) (*user.U
 	u, err := query.UserFindByEmail(ctx, email)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errDomain.ErrNotFound
+			return nil, user.ErrUserNotFound
 		}
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (r *userRepository) FindByID(ctx context.Context, id string) (*user.User, e
 	u, err := query.UserFindById(ctx, id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errDomain.ErrNotFound
+			return nil, user.ErrUserNotFound
 		}
 		return nil, err
 	}
@@ -83,12 +83,19 @@ func (r *userRepository) FindByID(ctx context.Context, id string) (*user.User, e
 
 func (r *userRepository) Save(ctx context.Context, u *user.User) error {
 	query := db.GetQuery(ctx)
-	if err := query.UserInsert(ctx, dbgen.UserInsertParams{
+	err := query.UserInsert(ctx, dbgen.UserInsertParams{
 		ID:             u.ID(),
 		Email:          u.Email(),
 		Nickname:       u.Nickname(),
 		PasswordDigest: u.PasswordDigest(),
-	}); err != nil {
+	})
+	if err != nil {
+		var mysqlErr *mysql.MySQLError
+		if errors.As(err, &mysqlErr) {
+			if mysqlErr.Number == 1062 {
+				return user.ErrUserDuplicateEmailOrNickname
+			}
+		}
 		return err
 	}
 	return nil

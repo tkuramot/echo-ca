@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"errors"
 	sessionDomain "github/tkuramot/echo-practice/internal/domain/session"
 	userDomain "github/tkuramot/echo-practice/internal/domain/user"
 )
@@ -35,6 +36,9 @@ func (uc LoginUserUseCase) Run(
 ) (*LoginUserUseCaseOutputDto, error) {
 	user, err := uc.userRepo.FindByEmail(ctx, dto.Email)
 	if err != nil {
+		if errors.Is(err, userDomain.ErrUserNotFound) {
+			return nil, userDomain.ErrUserUnauthorized
+		}
 		return nil, err
 	}
 

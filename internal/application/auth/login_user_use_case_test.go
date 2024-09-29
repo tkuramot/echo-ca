@@ -8,7 +8,6 @@ import (
 	"go.uber.org/mock/gomock"
 	"testing"
 
-	errDomain "github/tkuramot/echo-practice/internal/domain/error"
 	sessionDomain "github/tkuramot/echo-practice/internal/domain/session"
 	"github/tkuramot/echo-practice/internal/domain/user"
 	userDomain "github/tkuramot/echo-practice/internal/domain/user"
@@ -72,7 +71,7 @@ func TestLoginUserUseCase_Run(t *testing.T) {
 				mockUserRepo.
 					EXPECT().
 					FindByEmail(gomock.Any(), "wrong@example.com").
-					Return(nil, errDomain.ErrNotFound)
+					Return(nil, userDomain.ErrUserNotFound)
 			},
 			sessionMockFunc: func() {
 				mockSessionRepo.

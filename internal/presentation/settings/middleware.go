@@ -18,9 +18,16 @@ func errorMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		if errors.As(err, &domainErr) {
 			switch {
 			case errors.Is(domainErr, errDomain.ErrNotFound):
-				return ReturnStatusNotFound(c, domainErr)
+				return ReturnStatusNotFound(c, err)
 			default:
-				return ReturnStatusBadRequest(c, domainErr)
+				return ReturnStatusBadRequest(c, err)
+			}
+		}
+		var echoErr *echo.HTTPError
+		if errors.As(err, &echoErr) {
+			switch {
+			case echoErr.Code == 404:
+				return ReturnStatusNotFound(c, errDomain.ErrNotFound)
 			}
 		}
 		return ReturnStatusInternalServerError(c, err)

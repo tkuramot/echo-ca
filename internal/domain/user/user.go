@@ -24,7 +24,20 @@ const (
 	passwordLengthMin = 8
 )
 
-var ErrDuplicateUser = errDomain.NewError("ニックネームもしくはメールアドレスが既に登録されています。")
+var (
+	ErrUserNotFound = errDomain.NewError(
+		errDomain.NotFound,
+		"ユーザーが見つかりませんでした",
+	)
+	ErrUserUnauthorized = errDomain.NewError(
+		errDomain.Unauthorized,
+		"無効な認証情報です",
+	)
+	ErrUserDuplicateEmailOrNickname = errDomain.NewError(
+		errDomain.InvalidArgument,
+		"メールアドレスまたはニックネームが既に利用されています",
+	)
+)
 
 func Reconstruct(id, email, nickname, passwordDigest string) (*User, error) {
 	return newUser(id, email, nickname, passwordDigest)
@@ -37,7 +50,10 @@ func NewUser(email, nickname, password string) (*User, error) {
 	hasDigit := regexp.MustCompile(`\d`).MatchString(password)
 	hasSpecial := regexp.MustCompile(`[\W_]`).MatchString(password) // 特殊文字
 	if !re.MatchString(password) || !hasLower || !hasUpper || !hasDigit || !hasSpecial {
-		return nil, errDomain.NewError("パスワードは8文字以上、大文字・小文字・数字・特殊文字を含む必要があります。")
+		return nil, errDomain.NewError(
+			errDomain.InvalidArgument,
+			"パスワードは8文字以上、大文字・小文字・数字・特殊文字を含む必要があります",
+		)
 	}
 
 	passwordDigest, err := pwd.Hash(password)
@@ -49,11 +65,17 @@ func NewUser(email, nickname, password string) (*User, error) {
 
 func newUser(id, email, nickname, passwordDigest string) (*User, error) {
 	if utf8.RuneCountInString(nickname) < nameLengthMin || utf8.RuneCountInString(nickname) > nameLengthMax {
-		return nil, errDomain.NewError("ニックネームは2文字以上、255文字以下で入力してください。")
+		return nil, errDomain.NewError(
+			errDomain.InvalidArgument,
+			"ニックネームは2文字以上、255文字以下で入力してください",
+		)
 	}
 
 	if _, err := mail.ParseAddress(email); err != nil {
-		return nil, errDomain.NewError("メールアドレスが無効な形式です。")
+		return nil, errDomain.NewError(
+			errDomain.InvalidArgument,
+			"メールアドレスが無効な形式です",
+		)
 	}
 
 	return &User{
@@ -83,7 +105,7 @@ func (u *User) PasswordDigest() string {
 func (u *User) Authenticate(password string) error {
 	err := pwd.Verify(password, u.passwordDigest)
 	if err != nil {
-		return errDomain.NewError("無効な認証情報です。")
+		return ErrUserUnauthorized
 	}
 	return nil
 }
