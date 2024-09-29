@@ -2,9 +2,9 @@ package settings
 
 import (
 	"errors"
-	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	errDomain "github/tkuramot/echo-practice/internal/domain/error"
+	echoRepo "github/tkuramot/echo-practice/internal/infrastructure/echo/repository"
 )
 
 func errorMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
@@ -29,16 +29,10 @@ func errorMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 
 func AuthMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		sess, err := session.Get(SessionKey, c)
-		if err != nil {
+		sessionRepo := echoRepo.NewSessionRepository(c)
+		if err := sessionRepo.Verify(); err != nil {
 			return ReturnStatusUnauthorized(c, err)
 		}
-
-		userID := sess.Values[SessionUserIDKey]
-		if userID == nil {
-			return ReturnStatusUnauthorized(c, errors.New("unauthorized"))
-		}
-
 		return next(c)
 	}
 }

@@ -5,6 +5,7 @@ import "testing"
 func TestNewSession(t *testing.T) {
 	type args struct {
 		userID          string
+		rememberMe      bool
 		isAuthenticated bool
 	}
 	tests := []struct {
@@ -16,17 +17,20 @@ func TestNewSession(t *testing.T) {
 			name: "success",
 			args: args{
 				userID:          "test",
+				rememberMe:      true,
 				isAuthenticated: true,
 			},
 			want: &Session{
 				userID:          "test",
+				rememberMe:      true,
 				isAuthenticated: true,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewSession(tt.args.userID, tt.args.isAuthenticated); got.userID != tt.want.userID {
+			got := NewSession(tt.args.userID, tt.args.rememberMe, tt.args.isAuthenticated)
+			if got.userID != tt.want.userID {
 				t.Errorf("NewSession() = %v, want %v", got, tt.want)
 			}
 		})

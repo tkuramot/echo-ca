@@ -32,8 +32,9 @@ func TestLoginUserUseCase_Run(t *testing.T) {
 		{
 			name: "valid credentials",
 			dto: LoginUserUseCaseInputDto{
-				Email:    "test@example.com",
-				Password: "P4ssw0rd!",
+				Email:      "test@example.com",
+				Password:   "P4ssw0rd!",
+				RememberMe: true,
 			},
 			userMockFunc: func() {
 				mockUserRepo.
@@ -51,7 +52,7 @@ func TestLoginUserUseCase_Run(t *testing.T) {
 			sessionMockFunc: func() {
 				mockSessionRepo.
 					EXPECT().
-					Save(reconstructSession("whatever", true)).
+					Save(reconstructSession("whatever", true, true)).
 					Return(nil)
 			},
 			want: &LoginUserUseCaseOutputDto{
@@ -152,6 +153,6 @@ func reconstructUser(
 	return u, nil
 }
 
-func reconstructSession(userID string, isAuthenticated bool) *sessionDomain.Session {
-	return sessionDomain.NewSession(userID, isAuthenticated)
+func reconstructSession(userID string, isAuthenticated, rememberMe bool) *sessionDomain.Session {
+	return sessionDomain.NewSession(userID, isAuthenticated, rememberMe)
 }

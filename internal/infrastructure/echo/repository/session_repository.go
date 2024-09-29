@@ -29,11 +29,26 @@ func (r *SessionRepository) Get() (*sessionDomain.Session, error) {
 	if !ok {
 		return nil, sessionDomain.ErrInvalidSession
 	}
+	rememberMe, ok := sess.Values[sessionDomain.KeyRememberMe].(bool)
+	if !ok {
+		return nil, sessionDomain.ErrInvalidSession
+	}
 
 	return sessionDomain.NewSession(
 		userID,
 		isAuthenticated,
+		rememberMe,
 	), nil
+}
+
+func (r *SessionRepository) Delete() error {
+	sess, err := session.Get(sessionDomain.ID, r.ctx)
+	if err != nil {
+		return err
+	}
+	sess.Values = make(map[interface{}]interface{})
+	sess.Options.MaxAge = -1
+	return sess.Save(r.ctx.Request(), r.ctx.Response())
 }
 
 func (r *SessionRepository) Save(s *sessionDomain.Session) error {
@@ -42,13 +57,38 @@ func (r *SessionRepository) Save(s *sessionDomain.Session) error {
 		return err
 	}
 
-	// TODO persist session when remember me is checked
-	sess.Options = &sessions.Options{
-		Path:     "/",
-		MaxAge:   0,
-		HttpOnly: true,
+	if s.RememberMe() {
+		sess.Options = &sessions.Options{
+			Path:     "/",
+			MaxAge:   86400 * 7,
+			HttpOnly: true,
+		}
+	} else {
+		sess.Options = &sessions.Options{
+			Path:     "/",
+			MaxAge:   0,
+			HttpOnly: true,
+		}
 	}
 	sess.Values[sessionDomain.KeyUserID] = s.UserID()
 	sess.Values[sessionDomain.KeyIsAuthenticated] = s.IsAuthenticated()
 	return sess.Save(r.ctx.Request(), r.ctx.Response())
+}
+
+func (r *SessionRepository) Verify() error {
+	sess, err := session.Get(sessionDomain.ID, r.ctx)
+	if err != nil {
+		return err
+	}
+
+	if _, ok := sess.Values[sessionDomain.KeyUserID]; !ok {
+		return sessionDomain.ErrInvalidSession
+	}
+	if _, ok := sess.Values[sessionDomain.KeyIsAuthenticated]; !ok {
+		return sessionDomain.ErrInvalidSession
+	}
+	if _, ok := sess.Values[sessionDomain.KeyRememberMe]; !ok {
+		return sessionDomain.ErrInvalidSession
+	}
+	return nil
 }

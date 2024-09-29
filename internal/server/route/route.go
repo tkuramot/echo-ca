@@ -32,6 +32,7 @@ func authRoute(g *echo.Group) {
 	userRepo := repository.NewUserRepository()
 	h := authPre.NewHandler(
 		authApp.NewLoginUserUseCase(userRepo),
+		authApp.NewLogoutUserUseCase(),
 	)
 	group := g.Group("/auth")
 	group.POST("/login", h.LoginUser)
@@ -41,6 +42,7 @@ func protectedAuthRoute(g *echo.Group) {
 	userRepo := repository.NewUserRepository()
 	h := authPre.NewHandler(
 		authApp.NewLoginUserUseCase(userRepo),
+		authApp.NewLogoutUserUseCase(),
 	)
 	group := g.Group("/auth")
 	group.POST("/logout", h.LogoutUser)

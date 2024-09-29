@@ -1,8 +1,6 @@
 package auth
 
 import (
-	"github.com/gorilla/sessions"
-	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"net/http"
 
@@ -12,14 +10,17 @@ import (
 )
 
 type Handler struct {
-	loginUserUseCase *authApp.LoginUserUseCase
+	loginUserUseCase  *authApp.LoginUserUseCase
+	logoutUserUseCase *authApp.LogoutUserUseCase
 }
 
 func NewHandler(
 	loginUserUseCase *authApp.LoginUserUseCase,
+	logoutUserUseCase *authApp.LogoutUserUseCase,
 ) *Handler {
 	return &Handler{
-		loginUserUseCase: loginUserUseCase,
+		loginUserUseCase:  loginUserUseCase,
+		logoutUserUseCase: logoutUserUseCase,
 	}
 }
 
@@ -31,8 +32,9 @@ func (h *Handler) LoginUser(c echo.Context) error {
 	}
 
 	dto := authApp.LoginUserUseCaseInputDto{
-		Email:    params.Email,
-		Password: params.Password,
+		Email:      params.Email,
+		Password:   params.Password,
+		RememberMe: params.RememberMe,
 	}
 	sessionRepo := echoRepo.NewSessionRepository(c)
 	user, err := h.loginUserUseCase.Run(ctx, sessionRepo, dto)
@@ -50,17 +52,9 @@ func (h *Handler) LoginUser(c echo.Context) error {
 }
 
 func (h *Handler) LogoutUser(c echo.Context) error {
-	sess, err := session.Get(settings.SessionKey, c)
-	if err != nil {
-		return settings.ReturnStatusInternalServerError(c, err)
-	}
-	sess.Options = &sessions.Options{
-		Path:     "/",
-		MaxAge:   -1,
-		HttpOnly: true,
-	}
-	if err := sess.Save(c.Request(), c.Response()); err != nil {
-		return settings.ReturnStatusInternalServerError(c, err)
+	sessionRepo := echoRepo.NewSessionRepository(c)
+	if err := h.logoutUserUseCase.Run(sessionRepo); err != nil {
+		return err
 	}
 	return c.NoContent(http.StatusOK)
 }

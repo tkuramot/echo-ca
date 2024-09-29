@@ -17,8 +17,9 @@ func NewLoginUserUseCase(userRepo userDomain.Repository) *LoginUserUseCase {
 }
 
 type LoginUserUseCaseInputDto struct {
-	Email    string
-	Password string
+	Email      string
+	Password   string
+	RememberMe bool
 }
 
 type LoginUserUseCaseOutputDto struct {
@@ -41,7 +42,7 @@ func (uc LoginUserUseCase) Run(
 		return nil, err
 	}
 
-	sess := sessionDomain.NewSession(user.ID(), true)
+	sess := sessionDomain.NewSession(user.ID(), true, dto.RememberMe)
 	if err := sessionRepo.Save(sess); err != nil {
 		return nil, err
 	}

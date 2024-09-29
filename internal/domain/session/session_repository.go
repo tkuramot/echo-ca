@@ -3,5 +3,7 @@ package session
 
 type Repository interface {
 	Get() (*Session, error)
+	Delete() error
 	Save(session *Session) error
+	Verify() error
 }

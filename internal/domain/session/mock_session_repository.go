@@ -38,6 +38,20 @@ func (m *MockRepository) EXPECT() *MockRepositoryMockRecorder {
 	return m.recorder
 }
 
+// Delete mocks base method.
+func (m *MockRepository) Delete() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Delete")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Delete indicates an expected call of Delete.
+func (mr *MockRepositoryMockRecorder) Delete() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockRepository)(nil).Delete))
+}
+
 // Get mocks base method.
 func (m *MockRepository) Get() (*Session, error) {
 	m.ctrl.T.Helper()
@@ -65,4 +79,18 @@ func (m *MockRepository) Save(session *Session) error {
 func (mr *MockRepositoryMockRecorder) Save(session any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockRepository)(nil).Save), session)
+}
+
+// Verify mocks base method.
+func (m *MockRepository) Verify() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Verify")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Verify indicates an expected call of Verify.
+func (mr *MockRepositoryMockRecorder) Verify() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Verify", reflect.TypeOf((*MockRepository)(nil).Verify))
 }
