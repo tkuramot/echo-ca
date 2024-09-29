@@ -6,10 +6,6 @@ type userResponseModel struct {
 	Nickname string `json:"nickname"`
 }
 
-type registerUserResponse struct {
-	User userResponseModel `json:"user"`
-}
-
 type loginUserResponse struct {
 	User userResponseModel `json:"user"`
 }

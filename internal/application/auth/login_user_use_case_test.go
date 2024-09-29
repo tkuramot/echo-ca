@@ -4,10 +4,12 @@ import (
 	"context"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+	"github/tkuramot/echo-practice/internal/domain/session"
 	"go.uber.org/mock/gomock"
 	"testing"
 
 	errDomain "github/tkuramot/echo-practice/internal/domain/error"
+	sessionDomain "github/tkuramot/echo-practice/internal/domain/session"
 	"github/tkuramot/echo-practice/internal/domain/user"
 	userDomain "github/tkuramot/echo-practice/internal/domain/user"
 	pwd "github/tkuramot/echo-practice/pkg/password"
@@ -16,14 +18,16 @@ import (
 func TestLoginUserUseCase_Run(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	mockUserRepo := user.NewMockRepository(ctrl)
+	mockSessionRepo := session.NewMockRepository(ctrl)
 	uc := NewLoginUserUseCase(mockUserRepo)
 
 	tests := []struct {
-		name     string
-		dto      LoginUserUseCaseInputDto
-		mockFunc func()
-		want     *LoginUserUseCaseOutputDto
-		wantErr  bool
+		name            string
+		dto             LoginUserUseCaseInputDto
+		userMockFunc    func()
+		sessionMockFunc func()
+		want            *LoginUserUseCaseOutputDto
+		wantErr         bool
 	}{
 		{
 			name: "valid credentials",
@@ -31,7 +35,7 @@ func TestLoginUserUseCase_Run(t *testing.T) {
 				Email:    "test@example.com",
 				Password: "P4ssw0rd!",
 			},
-			mockFunc: func() {
+			userMockFunc: func() {
 				mockUserRepo.
 					EXPECT().
 					FindByEmail(gomock.Any(), "test@example.com").
@@ -43,6 +47,12 @@ func TestLoginUserUseCase_Run(t *testing.T) {
 							"P4ssw0rd!",
 						),
 					)
+			},
+			sessionMockFunc: func() {
+				mockSessionRepo.
+					EXPECT().
+					Save(reconstructSession("whatever", true)).
+					Return(nil)
 			},
 			want: &LoginUserUseCaseOutputDto{
 				ID:       "whatever",
@@ -57,11 +67,17 @@ func TestLoginUserUseCase_Run(t *testing.T) {
 				Email:    "wrong@example.com",
 				Password: "P4ssw0rd!",
 			},
-			mockFunc: func() {
+			userMockFunc: func() {
 				mockUserRepo.
 					EXPECT().
 					FindByEmail(gomock.Any(), "wrong@example.com").
 					Return(nil, errDomain.ErrNotFound)
+			},
+			sessionMockFunc: func() {
+				mockSessionRepo.
+					EXPECT().
+					Save(gomock.Any()).
+					Times(0)
 			},
 			want:    nil,
 			wantErr: true,
@@ -72,7 +88,7 @@ func TestLoginUserUseCase_Run(t *testing.T) {
 				Email:    "test@example.com",
 				Password: "wrong",
 			},
-			mockFunc: func() {
+			userMockFunc: func() {
 				mockUserRepo.
 					EXPECT().
 					FindByEmail(gomock.Any(), "test@example.com").
@@ -85,6 +101,12 @@ func TestLoginUserUseCase_Run(t *testing.T) {
 						),
 					)
 			},
+			sessionMockFunc: func() {
+				mockSessionRepo.
+					EXPECT().
+					Save(gomock.Any()).
+					Times(0)
+			},
 			want:    nil,
 			wantErr: true,
 		},
@@ -92,8 +114,9 @@ func TestLoginUserUseCase_Run(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.mockFunc()
-			got, err := uc.Run(context.Background(), tt.dto)
+			tt.userMockFunc()
+			tt.sessionMockFunc()
+			got, err := uc.Run(context.Background(), mockSessionRepo, tt.dto)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("LoginUserUseCase.Run() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -127,4 +150,8 @@ func reconstructUser(
 		return nil, err
 	}
 	return u, nil
+}
+
+func reconstructSession(userID string, isAuthenticated bool) *sessionDomain.Session {
+	return sessionDomain.NewSession(userID, isAuthenticated)
 }

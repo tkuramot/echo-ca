@@ -8,15 +8,44 @@ import (
 )
 
 type Handler struct {
-	findUserUseCase *userApp.FindUserUseCase
+	findUserUseCase     *userApp.FindUserUseCase
+	registerUserUseCase *userApp.RegisterUserUseCase
 }
 
 func NewHandler(
 	findUserUseCase *userApp.FindUserUseCase,
+	registerUserUseCase *userApp.RegisterUserUseCase,
 ) *Handler {
 	return &Handler{
-		findUserUseCase: findUserUseCase,
+		findUserUseCase:     findUserUseCase,
+		registerUserUseCase: registerUserUseCase,
 	}
+}
+
+func (h *Handler) RegisterUser(c echo.Context) error {
+	ctx := c.Request().Context()
+	var params registerUserParams
+	if err := c.Bind(&params); err != nil {
+		return settings.ReturnStatusBadRequest(c, err)
+	}
+
+	dto := userApp.RegisterUserUseCaseInputDto{
+		Email:    params.Email,
+		Nickname: params.Nickname,
+		Password: params.Password,
+	}
+	user, err := h.registerUserUseCase.Run(ctx, dto)
+	if err != nil {
+		return err
+	}
+
+	return settings.ReturnStatusCreated(c, registerUserResponse{
+		User: userResponseModel{
+			ID:       user.ID,
+			Email:    user.Email,
+			Nickname: user.Nickname,
+		},
+	})
 }
 
 func (h *Handler) GetUserByID(c echo.Context) error {

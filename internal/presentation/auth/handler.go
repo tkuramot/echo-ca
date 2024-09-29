@@ -7,60 +7,26 @@ import (
 	"net/http"
 
 	authApp "github/tkuramot/echo-practice/internal/application/auth"
-	sessionApp "github/tkuramot/echo-practice/internal/application/session"
 	echoRepo "github/tkuramot/echo-practice/internal/infrastructure/echo/repository"
 	"github/tkuramot/echo-practice/internal/presentation/settings"
 )
 
 type Handler struct {
-	registerUserUseCase  *authApp.RegisterUserUseCase
-	loginUserUseCase     *authApp.LoginUserUseCase
-	createSessionUseCase *sessionApp.CreateSessionUseCase
+	loginUserUseCase *authApp.LoginUserUseCase
 }
 
 func NewHandler(
-	registerUserUseCase *authApp.RegisterUserUseCase,
 	loginUserUseCase *authApp.LoginUserUseCase,
-	createSessionUseCase *sessionApp.CreateSessionUseCase,
 ) *Handler {
 	return &Handler{
-		registerUserUseCase:  registerUserUseCase,
-		loginUserUseCase:     loginUserUseCase,
-		createSessionUseCase: createSessionUseCase,
+		loginUserUseCase: loginUserUseCase,
 	}
-}
-
-func (h *Handler) RegisterUser(c echo.Context) error {
-	ctx := c.Request().Context()
-	var params registerUserParams
-	if err := c.Bind(&params); err != nil {
-		return settings.ReturnStatusBadRequest(c, err)
-	}
-
-	dto := authApp.RegisterUserUseCaseInputDto{
-		Email:    params.Email,
-		Nickname: params.Nickname,
-		Password: params.Password,
-	}
-	user, err := h.registerUserUseCase.Run(ctx, dto)
-	if err != nil {
-		return err
-	}
-
-	return settings.ReturnStatusCreated(c, registerUserResponse{
-		User: userResponseModel{
-			ID:       user.ID,
-			Email:    user.Email,
-			Nickname: user.Nickname,
-		},
-	})
 }
 
 func (h *Handler) LoginUser(c echo.Context) error {
 	ctx := c.Request().Context()
 	var params loginUserParams
 	if err := c.Bind(&params); err != nil {
-		// TODO: error message
 		return settings.ReturnStatusBadRequest(c, err)
 	}
 
@@ -68,20 +34,12 @@ func (h *Handler) LoginUser(c echo.Context) error {
 		Email:    params.Email,
 		Password: params.Password,
 	}
-	user, err := h.loginUserUseCase.Run(ctx, dto)
+	sessionRepo := echoRepo.NewSessionRepository(c)
+	user, err := h.loginUserUseCase.Run(ctx, sessionRepo, dto)
 	if err != nil {
-		// TODO error message
 		return settings.ReturnStatusUnauthorized(c, err)
 	}
 
-	sessionRepo := echoRepo.NewSessionRepository(c)
-	err = h.createSessionUseCase.Run(sessionRepo, sessionApp.CreateSessionUseCaseInputDto{
-		IsAuthenticated: true,
-		UserID:          user.ID,
-	})
-	if err != nil {
-		return settings.ReturnStatusInternalServerError(c, err)
-	}
 	return settings.ReturnStatusOK(c, loginUserResponse{
 		User: userResponseModel{
 			ID:       user.ID,
