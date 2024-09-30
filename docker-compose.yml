@@ -27,7 +27,7 @@ services:
     container_name: app
     build:
       context: .
-      dockerfile: ./build/Dockerfile
+      dockerfile: Dockerfile
     restart: on-failure
     networks:
       - echo-practice-network
@@ -35,6 +35,22 @@ services:
       - "8080:8080"
     volumes:
       - ./:/app
-    entrypoint: ["go", "run", "./cmd/main.go"]
+    entrypoint: ["sh", "-c", "go run ./cmd/main.go"]
     depends_on:
       - db
+
+  web:
+    container_name: web
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    restart: on-failure
+    networks:
+      - echo-practice-network
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./web:/app
+    entrypoint: ["sh", "-c", "pnpm install && pnpm dev"]
+    depends_on:
+      - app

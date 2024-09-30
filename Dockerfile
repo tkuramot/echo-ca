@@ -1,9 +1,8 @@
-FROM golang:1.23.1-alpine3.20
+FROM golang:1.23.1-alpine
 
 WORKDIR /app
-COPY ./ ./
 
-WORKDIR /app
+COPY go.mod go.sum ./
 RUN go mod download
 
 RUN go install go.uber.org/mock/mockgen@v0.4.0
