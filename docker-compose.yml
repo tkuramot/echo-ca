@@ -35,7 +35,7 @@ services:
       - "8080:8080"
     volumes:
       - ./:/app
-    entrypoint: ["sh", "-c", "go run ./cmd/main.go"]
+    entrypoint: ["air"]
     depends_on:
       - db
 
