@@ -41,6 +41,19 @@ func (r *SessionRepository) Get() (*sessionDomain.Session, error) {
 	), nil
 }
 
+func (r *SessionRepository) UserID() (string, error) {
+	sess, err := session.Get(sessionDomain.ID, r.ctx)
+	if err != nil {
+		return "", err
+	}
+
+	userID, ok := sess.Values[sessionDomain.KeyUserID].(string)
+	if !ok {
+		return "", sessionDomain.ErrInvalidSession
+	}
+	return userID, nil
+}
+
 func (r *SessionRepository) Delete() error {
 	sess, err := session.Get(sessionDomain.ID, r.ctx)
 	if err != nil {

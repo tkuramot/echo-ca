@@ -81,6 +81,21 @@ func (mr *MockRepositoryMockRecorder) Save(session any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockRepository)(nil).Save), session)
 }
 
+// UserID mocks base method.
+func (m *MockRepository) UserID() (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UserID")
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UserID indicates an expected call of UserID.
+func (mr *MockRepositoryMockRecorder) UserID() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserID", reflect.TypeOf((*MockRepository)(nil).UserID))
+}
+
 // Verify mocks base method.
 func (m *MockRepository) Verify() error {
 	m.ctrl.T.Helper()

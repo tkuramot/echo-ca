@@ -53,6 +53,7 @@ func userRoute(g *echo.Group) {
 	h := userPre.NewHandler(
 		userApp.NewFindUserUseCase(userRepo),
 		userApp.NewRegisterUserUseCase(userRepo),
+		userApp.NewGetCurrentUseCase(userRepo),
 	)
 	group := g.Group("/users")
 	group.POST("", h.RegisterUser)
@@ -63,7 +64,9 @@ func protectedUserRoute(g *echo.Group) {
 	h := userPre.NewHandler(
 		userApp.NewFindUserUseCase(userRepo),
 		userApp.NewRegisterUserUseCase(userRepo),
+		userApp.NewGetCurrentUseCase(userRepo),
 	)
 	group := g.Group("/users")
 	group.GET("/:id", h.GetUserByID)
+	group.GET("/me", h.GetCurrentUser)
 }
