@@ -1,4 +1,4 @@
-import {
+export {
   Form,
   FormControl,
   FormDescription,
@@ -8,18 +8,5 @@ import {
   FormMessage,
   useFormField,
 } from "@/components/ui/form/form";
-import { Input } from "@/components/ui/form/input";
-import { Label } from "@/components/ui/form/label";
-
-export {
-  useFormField,
-  Form,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormDescription,
-  FormMessage,
-  FormField,
-  Input,
-  Label,
-};
+export { Input } from "@/components/ui/form/input";
+export { Label } from "@/components/ui/form/label";

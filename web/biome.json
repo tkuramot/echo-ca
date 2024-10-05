@@ -21,6 +21,9 @@
     "ignore": ["*.config.ts", "*.config.js"],
     "rules": {
       "all": true,
+      "performance": {
+        "noBarrelFile": "off"
+      },
       "suspicious": {
         "all": true,
         "noReactSpecificProps": "off"
