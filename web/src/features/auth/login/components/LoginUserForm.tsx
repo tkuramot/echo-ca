@@ -8,25 +8,21 @@ import {
   FormMessage,
 } from "@/components/ui/form/form";
 import { Input } from "@/components/ui/form/input";
+import { loginInputSchema } from "@/lib/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-const schema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-});
+import type { z } from "zod";
 
 export const LoginUserForm = () => {
-  const form = useForm<z.infer<typeof schema>>({
-    resolver: zodResolver(schema),
+  const form = useForm<z.infer<typeof loginInputSchema>>({
+    resolver: zodResolver(loginInputSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
 
-  const handleSubmit = (values: z.infer<typeof schema>) => {
+  const handleSubmit = (values: z.infer<typeof loginInputSchema>) => {
     console.log(values);
   };
 

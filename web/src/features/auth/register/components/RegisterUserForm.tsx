@@ -8,19 +8,14 @@ import {
   FormMessage,
 } from "@/components/ui/form/form";
 import { Input } from "@/components/ui/form/input";
+import { registerInputSchema } from "@/lib/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-const schema = z.object({
-  nickname: z.string().min(2).max(255),
-  email: z.string().email(),
-  password: z.string().min(8),
-});
+import type { z } from "zod";
 
 export const RegisterUserForm = () => {
-  const form = useForm<z.infer<typeof schema>>({
-    resolver: zodResolver(schema),
+  const form = useForm<z.infer<typeof registerInputSchema>>({
+    resolver: zodResolver(registerInputSchema),
     defaultValues: {
       nickname: "",
       email: "",
@@ -28,7 +23,7 @@ export const RegisterUserForm = () => {
     },
   });
 
-  const handleSubmit = (values: z.infer<typeof schema>) => {
+  const handleSubmit = (values: z.infer<typeof registerInputSchema>) => {
     console.log(values);
   };
 

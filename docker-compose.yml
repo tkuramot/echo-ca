@@ -51,6 +51,8 @@ services:
       - "3000:3000"
     volumes:
       - ./web:/app
+    environment:
+      - VITE_APP_API_URL
     entrypoint: ["sh", "-c", "pnpm install && pnpm dev"]
     depends_on:
       - app

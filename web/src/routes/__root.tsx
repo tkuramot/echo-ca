@@ -1,7 +1,12 @@
+import type { User } from "@/types/api";
 import { Link, Outlet, createRootRoute } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 
-export const Route = createRootRoute({
+type UserContext = {
+  user: User;
+};
+
+export const Route = createRootRoute<UserContext>({
   component: RootComponent,
 });
 

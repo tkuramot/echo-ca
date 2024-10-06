@@ -1,1 +1,1 @@
-export * from "@/components/ui/spinner";
+export * from "@/components/ui/spinner/spinner";

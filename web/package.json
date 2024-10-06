@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.2",
+    "@tanstack/react-query-devtools": "^5.59.0",
     "@tanstack/router-plugin": "^1.58.12",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
@@ -40,6 +41,8 @@
     "nanoid": "^5.0.7",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-error-boundary": "^4.0.13",
+    "react-helmet-async": "^2.0.5",
     "react-hook-form": "^7.53.0",
     "react-query-auth": "^2.4.1",
     "tailwind-merge": "^2.5.3",
