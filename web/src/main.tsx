@@ -11,7 +11,9 @@ const router = createRouter({
   routeTree,
   defaultPreload: "intent",
   context: {
-    user: undefined,
+    loaded: false,
+    // biome-ignore lint/style/noNonNullAssertion: this is guaranteed to be set by the AppProvider
+    user: undefined!,
   },
 });
 
@@ -23,8 +25,13 @@ declare module "@tanstack/react-router" {
 }
 
 const App = () => {
-  const user = useUser();
-  return <RouterProvider router={router} context={{ user }} />;
+  const { data, isFetched } = useUser();
+  return (
+    <RouterProvider
+      router={router}
+      context={{ loaded: isFetched, user: data?.user }}
+    />
+  );
 };
 
 const rootElement = document.getElementById("app");

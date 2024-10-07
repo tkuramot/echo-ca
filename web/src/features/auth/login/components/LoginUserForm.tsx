@@ -8,13 +8,12 @@ import {
   FormMessage,
 } from "@/components/ui/form/form";
 import { Input } from "@/components/ui/form/input";
-import { loginInputSchema } from "@/lib/auth";
+import { type LoginInput, loginInputSchema, useLogin } from "@/lib/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import type { z } from "zod";
 
 export const LoginUserForm = () => {
-  const form = useForm<z.infer<typeof loginInputSchema>>({
+  const form = useForm<LoginInput>({
     resolver: zodResolver(loginInputSchema),
     defaultValues: {
       email: "",
@@ -22,8 +21,9 @@ export const LoginUserForm = () => {
     },
   });
 
-  const handleSubmit = (values: z.infer<typeof loginInputSchema>) => {
-    console.log(values);
+  const login = useLogin();
+  const handleSubmit = (values: LoginInput) => {
+    login.mutate(values);
   };
 
   return (

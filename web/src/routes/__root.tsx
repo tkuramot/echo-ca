@@ -1,12 +1,17 @@
 import type { User } from "@/types/api";
-import { Link, Outlet, createRootRoute } from "@tanstack/react-router";
+import {
+  Link,
+  Outlet,
+  createRootRouteWithContext,
+} from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 
 type UserContext = {
+  loaded: boolean;
   user: User;
 };
 
-export const Route = createRootRoute<UserContext>({
+export const Route = createRootRouteWithContext<UserContext>()({
   component: RootComponent,
 });
 
@@ -30,6 +35,14 @@ function RootComponent() {
           }}
         >
           About
+        </Link>
+        <Link
+          to="/dashboard"
+          activeProps={{
+            className: "font-bold",
+          }}
+        >
+          Dashboard
         </Link>
       </div>
       <hr />
