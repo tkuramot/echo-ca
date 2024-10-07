@@ -2,9 +2,8 @@ package user
 
 import (
 	"github.com/labstack/echo/v4"
-	echoRepo "github/tkuramot/echo-practice/internal/infrastructure/echo/repository"
-
 	userApp "github/tkuramot/echo-practice/internal/application/user"
+	echoRepo "github/tkuramot/echo-practice/internal/infrastructure/echo/repository"
 	"github/tkuramot/echo-practice/internal/presentation/settings"
 )
 

@@ -12,7 +12,12 @@ import (
 func NewEcho() *echo.Echo {
 	e := echo.New()
 
-	e.Use(middleware.CORS())
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		// TODO replace with actual frontend URL using env variable
+		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+		AllowCredentials: true,
+	}))
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	// TODO secret key
