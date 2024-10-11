@@ -1,3 +1,3 @@
-export * from "@/components/ui/form/form";
-export * from "@/components/ui/form/input";
-export * from "@/components/ui/form/label";
+export * from "@/components/ui/form/Form";
+export * from "@/components/ui/form/Input";
+export * from "@/components/ui/form/Label";

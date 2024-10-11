@@ -28,6 +28,12 @@ api.interceptors.response.use(
       message,
     });
 
+    if (error.response?.status === 401) {
+      const searchParams = new URLSearchParams();
+      const redirectTo = searchParams.get("redirect-to");
+      window.location.href = `/auth/login${redirectTo ? `?redirect-to=${encodeURIComponent(redirectTo)}` : ""}`;
+    }
+
     return Promise.reject(error);
   },
 );

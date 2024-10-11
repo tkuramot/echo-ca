@@ -1,6 +1,8 @@
 import { api } from "@/lib/apiClient";
 import type { User, UserResponse } from "@/types/api";
+import type React from "react";
 import { configureAuth } from "react-query-auth";
+import { Navigate, useLocation } from "react-router-dom";
 import { z } from "zod";
 
 export const getUser = async (): Promise<User> => {
@@ -51,7 +53,18 @@ const authConfig = {
 export const { useUser, useLogin, useLogout, useRegister, AuthLoader } =
   configureAuth(authConfig);
 
-export type AuthContext = {
-  isAuthenticated: boolean;
-  user: User | null;
+export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { data: user, isFetched } = useUser();
+  const location = useLocation();
+
+  if (isFetched && !user) {
+    return (
+      <Navigate
+        to={`/auth/login${location.pathname ? `?redirect-to=${encodeURIComponent(location.pathname)}` : ""}`}
+        replace={true}
+      />
+    );
+  }
+
+  return children;
 };

@@ -199,7 +199,7 @@ export const routeTree = rootRoute
       ]
     },
     "/": {
-      "filePath": "index.tsx"
+      "filePath": "index.ts"
     },
     "/_protected": {
       "filePath": "_protected.tsx",
