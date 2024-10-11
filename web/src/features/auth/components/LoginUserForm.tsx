@@ -10,9 +10,18 @@ import {
 import { Input } from "@/components/ui/form/input";
 import { type LoginInput, loginInputSchema, useLogin } from "@/lib/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigate, useRouter, useSearch } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 
+const fallback = "/" as const;
+
 export const LoginUserForm = () => {
+  const router = useRouter();
+  const navigate = useNavigate();
+  const search = useSearch({
+    from: "/auth/login",
+  });
+
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginInputSchema),
     defaultValues: {
@@ -22,8 +31,9 @@ export const LoginUserForm = () => {
   });
 
   const login = useLogin();
-  const handleSubmit = (values: LoginInput) => {
-    login.mutate(values);
+  const handleSubmit = async (values: LoginInput) => {
+    await login.mutate(values);
+    await navigate({ to: search.redirect || fallback });
   };
 
   return (

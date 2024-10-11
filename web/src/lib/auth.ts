@@ -1,22 +1,11 @@
 import { api } from "@/lib/apiClient";
 import type { User, UserResponse } from "@/types/api";
-import axios from "axios";
 import { configureAuth } from "react-query-auth";
 import { z } from "zod";
 
-const getUser = async (): Promise<User> => {
-  try {
-    return await api.get("/v1/users/me");
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.status === 401) {
-      return Promise.resolve({
-        id: "",
-        email: "",
-        nickname: "",
-      });
-    }
-    throw error;
-  }
+export const getUser = async (): Promise<User> => {
+  const response: UserResponse = await api.get("/v1/users/me");
+  return response.user;
 };
 
 const logout = async (): Promise<void> => {
@@ -29,10 +18,9 @@ export const loginInputSchema = z.object({
 });
 
 export type LoginInput = z.infer<typeof loginInputSchema>;
-const loginWithEmailAndPassword = async (
-  input: LoginInput,
-): Promise<UserResponse> => {
-  return await api.post("/v1/auth/login", input);
+const loginWithEmailAndPassword = async (input: LoginInput): Promise<User> => {
+  const response: UserResponse = await api.post("/v1/auth/login", input);
+  return response.user;
 };
 
 export const registerInputSchema = z.object({
@@ -44,22 +32,26 @@ export const registerInputSchema = z.object({
 export type RegisterInput = z.infer<typeof registerInputSchema>;
 const registerWithEmailAndPassword = async (
   input: RegisterInput,
-): Promise<UserResponse> => {
-  return await api.post("/v1/users", input);
+): Promise<User> => {
+  const response: UserResponse = await api.post("/v1/users", input);
+  return response.user;
 };
 
 const authConfig = {
   userFn: getUser,
   loginFn: async (data: LoginInput) => {
-    const response = await loginWithEmailAndPassword(data);
-    return response.user;
+    return await loginWithEmailAndPassword(data);
   },
   registerFn: async (data: RegisterInput) => {
-    const response = await registerWithEmailAndPassword(data);
-    return response.user;
+    return await registerWithEmailAndPassword(data);
   },
   logoutFn: logout,
 };
 
 export const { useUser, useLogin, useLogout, useRegister, AuthLoader } =
   configureAuth(authConfig);
+
+export type AuthContext = {
+  isAuthenticated: boolean;
+  user: User | null;
+};

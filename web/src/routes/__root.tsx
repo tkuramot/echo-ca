@@ -1,4 +1,4 @@
-import type { User } from "@/types/api";
+import { type AuthContext, useLogout } from "@/lib/auth";
 import {
   Link,
   Outlet,
@@ -6,16 +6,17 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 
-type UserContext = {
-  loaded: boolean;
-  user: User;
+type RouterContext = {
+  auth: AuthContext;
 };
 
-export const Route = createRootRouteWithContext<UserContext>()({
+export const Route = createRootRouteWithContext<RouterContext>()({
   component: RootComponent,
 });
 
 function RootComponent() {
+  const logout = useLogout();
+
   return (
     <>
       <div className="p-2 flex gap-2 text-lg">
@@ -43,6 +44,13 @@ function RootComponent() {
           }}
         >
           Dashboard
+        </Link>
+        <Link
+          onClick={async () => {
+            await logout.mutate();
+          }}
+        >
+          Logout
         </Link>
       </div>
       <hr />

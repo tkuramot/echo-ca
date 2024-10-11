@@ -27,8 +27,8 @@ export const RegisterUserForm = () => {
   });
 
   const register = useRegister();
-  const handleSubmit = (values: RegisterInput) => {
-    register.mutate(values);
+  const handleSubmit = async (values: RegisterInput) => {
+    await register.mutate(values);
   };
 
   return (
