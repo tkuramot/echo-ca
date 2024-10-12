@@ -84,15 +84,15 @@ func (mr *MockRepositoryMockRecorder) Save(ctx, userID, task any) *gomock.Call {
 }
 
 // UpdateStatus mocks base method.
-func (m *MockRepository) UpdateStatus(ctx context.Context, userID, taskID string, status Status) error {
+func (m *MockRepository) UpdateStatus(ctx context.Context, taskID string, status Status) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateStatus", ctx, userID, taskID, status)
+	ret := m.ctrl.Call(m, "UpdateStatus", ctx, taskID, status)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // UpdateStatus indicates an expected call of UpdateStatus.
-func (mr *MockRepositoryMockRecorder) UpdateStatus(ctx, userID, taskID, status any) *gomock.Call {
+func (mr *MockRepositoryMockRecorder) UpdateStatus(ctx, taskID, status any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateStatus", reflect.TypeOf((*MockRepository)(nil).UpdateStatus), ctx, userID, taskID, status)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateStatus", reflect.TypeOf((*MockRepository)(nil).UpdateStatus), ctx, taskID, status)
 }

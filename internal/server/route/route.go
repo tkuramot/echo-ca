@@ -2,6 +2,7 @@ package route
 
 import (
 	"github.com/labstack/echo/v4"
+	taskApp "github/tkuramot/echo-practice/internal/application/task"
 
 	authApp "github/tkuramot/echo-practice/internal/application/auth"
 	userApp "github/tkuramot/echo-practice/internal/application/user"
@@ -9,6 +10,7 @@ import (
 	authPre "github/tkuramot/echo-practice/internal/presentation/auth"
 	"github/tkuramot/echo-practice/internal/presentation/health_check"
 	"github/tkuramot/echo-practice/internal/presentation/settings"
+	taskPre "github/tkuramot/echo-practice/internal/presentation/task"
 	userPre "github/tkuramot/echo-practice/internal/presentation/user"
 )
 
@@ -25,6 +27,7 @@ func InitRoute(e *echo.Echo) {
 	{
 		protectedAuthRoute(protectedV1)
 		protectedUserRoute(protectedV1)
+		protectedTaskRoute(protectedV1)
 	}
 }
 
@@ -69,4 +72,13 @@ func protectedUserRoute(g *echo.Group) {
 	group := g.Group("/users")
 	group.GET("/:id", h.GetUserByID)
 	group.GET("/me", h.GetCurrentUser)
+}
+
+func protectedTaskRoute(g *echo.Group) {
+	taskRepo := repository.NewTaskRepository()
+	h := taskPre.NewHandler(
+		taskApp.NewSaveTaskUseCase(taskRepo),
+	)
+	group := g.Group("/tasks")
+	group.POST("", h.SaveTask)
 }
