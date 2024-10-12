@@ -67,6 +67,10 @@ func newTask(id, title, description string, status Status) (*Task, error) {
 	}, nil
 }
 
+func (t *Task) ID() string {
+	return t.id
+}
+
 func (t *Task) Title() string {
 	return t.title
 }
