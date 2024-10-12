@@ -1,5 +1,13 @@
 import { Button } from "@/components/ui/button/Button";
 import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
   Form,
   FormControl,
   FormField,
@@ -8,21 +16,16 @@ import {
   FormMessage,
 } from "@/components/ui/form/Form";
 import { Input } from "@/components/ui/form/Input";
-import { Link } from "@/components/ui/link";
-import {
-  type RegisterInput,
-  registerInputSchema,
-  useRegister,
-} from "@/lib/auth";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { type RegisterInput, useRegister } from "@/lib/auth";
 import { useForm } from "react-hook-form";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 type RegisterFormProps = {
   onSuccess: () => void;
 };
 
 export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("redirect-to");
 
@@ -34,7 +37,6 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
   };
 
   const form = useForm<RegisterInput>({
-    resolver: zodResolver(registerInputSchema),
     defaultValues: {
       nickname: "",
       email: "",
@@ -44,64 +46,85 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
 
   return (
     <>
-      <Form {...form}>
-        <form
-          noValidate={true}
-          onSubmit={form.handleSubmit(handleSubmit)}
-          className="space-y-8"
-        >
-          <FormField
-            control={form.control}
-            name="nickname"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>ニックネーム</FormLabel>
-                <FormControl>
-                  <Input type="text" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>メールアドレス</FormLabel>
-                <FormControl>
-                  <Input type="email" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>パスワード</FormLabel>
-                <FormControl>
-                  <Input type="password" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type="submit">登録</Button>
-        </form>
-      </Form>
-      <div className="mt-2 flex items-center justify-end">
-        <div className="text-sm">
-          <Link
-            to={`/auth/login${redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""}`}
-            className="font-medium text-blue-600 hover:text-blue-500"
+      <Card className="w-[400px]">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl">アカウント登録</CardTitle>
+          <CardDescription>
+            必要な情報を入力して、新しいアカウントを作成してください
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4">
+          <Form {...form}>
+            <form noValidate={true} onSubmit={form.handleSubmit(handleSubmit)}>
+              <div className="grid gap-2">
+                <FormField
+                  control={form.control}
+                  name="nickname"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>ニックネーム</FormLabel>
+                      <FormControl>
+                        <Input type="text" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="grid gap-2 mt-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>メールアドレス</FormLabel>
+                      <FormControl>
+                        <Input type="email" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="grid gap-2 mt-4">
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>パスワード</FormLabel>
+                      <FormControl>
+                        <Input type="password" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <Button
+                className="w-full mt-6"
+                type="submit"
+                disabled={register.isPending}
+              >
+                登録
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+        <CardFooter>
+          <Button
+            onClick={() => {
+              navigate(
+                `/auth/login${redirectTo ? `?redirect-to=${redirectTo}` : ""}`,
+              );
+            }}
+            variant="link"
+            className="px-0 text-sm text-muted-foreground"
           >
-            Log In
-          </Link>
-        </div>
-      </div>
+            すでにアカウントをお持ちですか？ ログイン
+          </Button>
+        </CardFooter>
+      </Card>
     </>
   );
 };
