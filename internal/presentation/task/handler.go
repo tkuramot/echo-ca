@@ -10,17 +10,20 @@ import (
 
 type Handler struct {
 	findAllTasksUseCase     *taskApp.FindAllTasksUseCase
+	updateTaskUseCase       *taskApp.UpdateTaskUseCase
 	updateTaskStatusUseCase *taskApp.UpdateTaskStatusUseCase
 	saveTaskUseCase         *taskApp.SaveTaskUseCase
 }
 
 func NewHandler(
 	findAllTasksUseCase *taskApp.FindAllTasksUseCase,
+	updateTaskUseCase *taskApp.UpdateTaskUseCase,
 	updateTaskStatusUseCase *taskApp.UpdateTaskStatusUseCase,
 	saveTaskUseCase *taskApp.SaveTaskUseCase,
 ) *Handler {
 	return &Handler{
 		findAllTasksUseCase:     findAllTasksUseCase,
+		updateTaskUseCase:       updateTaskUseCase,
 		updateTaskStatusUseCase: updateTaskStatusUseCase,
 		saveTaskUseCase:         saveTaskUseCase,
 	}
@@ -52,6 +55,39 @@ func (h *Handler) FindAllTasks(c echo.Context) error {
 	})
 }
 
+func (h *Handler) UpdateTask(c echo.Context) error {
+	ctx := c.Request().Context()
+	var params updateTaskParams
+	if err := c.Bind(&params); err != nil {
+		return settings.ReturnStatusBadRequest(c, err)
+	}
+
+	taskID := c.Param("id")
+	dto := taskApp.UpdateTaskUseCaseInputDto{
+		Title:       params.Title,
+		Description: params.Description,
+		Status:      params.Status,
+	}
+	sessionRepo := echoRepo.NewSessionRepository(c)
+	userID, err := sessionRepo.UserID()
+	if err != nil {
+		return err
+	}
+	task, err := h.updateTaskUseCase.Run(ctx, userID, taskID, dto)
+	if err != nil {
+		return err
+	}
+
+	return settings.ReturnStatusOK(c, updateTaskResponse{
+		Task: taskResponseModel{
+			ID:          task.ID,
+			Title:       task.Title,
+			Description: task.Description,
+			Status:      task.Status,
+		},
+	})
+}
+
 func (h *Handler) UpdateTaskStatus(c echo.Context) error {
 	ctx := c.Request().Context()
 	var params updateTaskStatusParams
@@ -63,7 +99,12 @@ func (h *Handler) UpdateTaskStatus(c echo.Context) error {
 	dto := taskApp.UpdateTaskStatusUseCaseInputDto{
 		Status: taskDomain.Status(params.Status),
 	}
-	err := h.updateTaskStatusUseCase.Run(ctx, taskID, dto)
+	sessionRepo := echoRepo.NewSessionRepository(c)
+	userID, err := sessionRepo.UserID()
+	if err != nil {
+		return err
+	}
+	err = h.updateTaskStatusUseCase.Run(ctx, userID, taskID, dto)
 	if err != nil {
 		return err
 	}
@@ -85,7 +126,7 @@ func (h *Handler) SaveTask(c echo.Context) error {
 	sessionRepo := echoRepo.NewSessionRepository(c)
 	userID, err := sessionRepo.UserID()
 	if err != nil {
-		return settings.ReturnStatusInternalServerError(c, err)
+		return err
 	}
 	task, err := h.saveTaskUseCase.Run(ctx, userID, dto)
 	if err != nil {

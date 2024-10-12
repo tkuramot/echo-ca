@@ -24,7 +24,7 @@ func TestUpdateTaskStatusUseCase_Run(t *testing.T) {
 			taskID: "taskID",
 			dto:    UpdateTaskStatusUseCaseInputDto{Status: taskDomain.InProgress},
 			mockFunc: func() {
-				mockRepo.EXPECT().UpdateStatus(gomock.Any(), "taskID", taskDomain.InProgress).Return(nil)
+				mockRepo.EXPECT().UpdateStatus(gomock.Any(), "userID", "taskID", taskDomain.InProgress).Return(nil)
 			},
 			wantErr: nil,
 		},
@@ -40,7 +40,7 @@ func TestUpdateTaskStatusUseCase_Run(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mockFunc()
-			err := uc.Run(nil, tt.taskID, tt.dto)
+			err := uc.Run(nil, "userID", tt.taskID, tt.dto)
 			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("want: %v, got: %v", tt.wantErr, err)
 			}

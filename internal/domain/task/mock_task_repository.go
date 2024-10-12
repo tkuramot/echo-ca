@@ -55,18 +55,18 @@ func (mr *MockRepositoryMockRecorder) FindAll(ctx, userID any) *gomock.Call {
 }
 
 // FindByID mocks base method.
-func (m *MockRepository) FindByID(ctx context.Context, taskID string) (*Task, error) {
+func (m *MockRepository) FindByID(ctx context.Context, userID, taskID string) (*Task, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindByID", ctx, taskID)
+	ret := m.ctrl.Call(m, "FindByID", ctx, userID, taskID)
 	ret0, _ := ret[0].(*Task)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // FindByID indicates an expected call of FindByID.
-func (mr *MockRepositoryMockRecorder) FindByID(ctx, taskID any) *gomock.Call {
+func (mr *MockRepositoryMockRecorder) FindByID(ctx, userID, taskID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByID", reflect.TypeOf((*MockRepository)(nil).FindByID), ctx, taskID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByID", reflect.TypeOf((*MockRepository)(nil).FindByID), ctx, userID, taskID)
 }
 
 // FindByStatus mocks base method.
@@ -98,16 +98,30 @@ func (mr *MockRepositoryMockRecorder) Save(ctx, userID, task any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockRepository)(nil).Save), ctx, userID, task)
 }
 
-// UpdateStatus mocks base method.
-func (m *MockRepository) UpdateStatus(ctx context.Context, taskID string, status Status) error {
+// Update mocks base method.
+func (m *MockRepository) Update(ctx context.Context, userID string, task *Task) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateStatus", ctx, taskID, status)
+	ret := m.ctrl.Call(m, "Update", ctx, userID, task)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Update indicates an expected call of Update.
+func (mr *MockRepositoryMockRecorder) Update(ctx, userID, task any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockRepository)(nil).Update), ctx, userID, task)
+}
+
+// UpdateStatus mocks base method.
+func (m *MockRepository) UpdateStatus(ctx context.Context, userID, taskID string, status Status) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateStatus", ctx, userID, taskID, status)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // UpdateStatus indicates an expected call of UpdateStatus.
-func (mr *MockRepositoryMockRecorder) UpdateStatus(ctx, taskID, status any) *gomock.Call {
+func (mr *MockRepositoryMockRecorder) UpdateStatus(ctx, userID, taskID, status any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateStatus", reflect.TypeOf((*MockRepository)(nil).UpdateStatus), ctx, taskID, status)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateStatus", reflect.TypeOf((*MockRepository)(nil).UpdateStatus), ctx, userID, taskID, status)
 }

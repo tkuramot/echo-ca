@@ -35,9 +35,12 @@ func (r *taskRepository) FindAll(ctx context.Context, userID string) ([]*task.Ta
 	return tasks, nil
 }
 
-func (r *taskRepository) FindByID(ctx context.Context, taskID string) (*task.Task, error) {
+func (r *taskRepository) FindByID(ctx context.Context, userID, taskID string) (*task.Task, error) {
 	query := db.GetQuery(ctx)
-	t, err := query.TaskFindById(ctx, taskID)
+	t, err := query.TaskFindById(ctx, dbgen.TaskFindByIdParams{
+		UserID: userID,
+		ID:     taskID,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -99,9 +102,22 @@ func (r *taskRepository) Save(ctx context.Context, userID string, t *task.Task) 
 	return err
 }
 
-func (r *taskRepository) UpdateStatus(ctx context.Context, taskID string, status task.Status) error {
+func (r *taskRepository) Update(ctx context.Context, userID string, t *task.Task) error {
+	query := db.GetQuery(ctx)
+	err := query.TaskUpdate(ctx, dbgen.TaskUpdateParams{
+		UserID:      userID,
+		ID:          t.ID(),
+		Title:       t.Title(),
+		Description: t.Description(),
+		Status:      dbgen.TasksStatus(t.Status()),
+	})
+	return err
+}
+
+func (r *taskRepository) UpdateStatus(ctx context.Context, userID, taskID string, status task.Status) error {
 	query := db.GetQuery(ctx)
 	err := query.TaskUpdateStatus(ctx, dbgen.TaskUpdateStatusParams{
+		UserID: userID,
 		ID:     taskID,
 		Status: dbgen.TasksStatus(status),
 	})

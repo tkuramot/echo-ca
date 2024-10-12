@@ -6,6 +6,10 @@ type findAllTasksResponse struct {
 	Tasks []taskResponseModel `json:"tasks"`
 }
 
+type updateTaskResponse struct {
+	Task taskResponseModel `json:"task"`
+}
+
 type saveTaskResponse struct {
 	Task taskResponseModel `json:"task"`
 }

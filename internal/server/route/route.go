@@ -78,11 +78,13 @@ func protectedTaskRoute(g *echo.Group) {
 	taskRepo := repository.NewTaskRepository()
 	h := taskPre.NewHandler(
 		taskApp.NewFindAllTasksUseCase(taskRepo),
+		taskApp.NewUpdateTaskUseCase(taskRepo),
 		taskApp.NewUpdateTaskStatusUseCase(taskRepo),
 		taskApp.NewSaveTaskUseCase(taskRepo),
 	)
 	group := g.Group("/tasks")
 	group.GET("", h.FindAllTasks)
+	group.POST("/:id", h.UpdateTask)
 	group.PATCH("/:id/status", h.UpdateTaskStatus)
 	group.POST("", h.SaveTask)
 }

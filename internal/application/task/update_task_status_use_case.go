@@ -23,13 +23,14 @@ type UpdateTaskStatusUseCaseInputDto struct {
 
 func (uc *UpdateTaskStatusUseCase) Run(
 	ctx context.Context,
+	userID string,
 	taskID string,
 	dto UpdateTaskStatusUseCaseInputDto,
 ) error {
-	if taskDomain.IsValidStatus(dto.Status) == false {
+	if !taskDomain.IsValidStatus(dto.Status) {
 		return taskDomain.ErrInvalidStatus
 	}
-	if err := uc.taskRepo.UpdateStatus(ctx, taskID, dto.Status); err != nil {
+	if err := uc.taskRepo.UpdateStatus(ctx, userID, taskID, dto.Status); err != nil {
 		return err
 	}
 	return nil

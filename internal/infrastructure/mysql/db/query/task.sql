@@ -9,7 +9,8 @@ WHERE user_tasks.user_id = ?;
 SELECT
     *
 FROM tasks
-WHERE id = ?;
+JOIN user_tasks ON user_tasks.task_id = tasks.id
+WHERE user_tasks.user_id = ? AND tasks.id = ?;
 
 -- name: TaskFindByStatus :many
 SELECT
@@ -40,7 +41,17 @@ VALUES (
 -- name: TaskUpdateStatus :exec
 UPDATE
     tasks
+JOIN user_tasks ON user_tasks.task_id = tasks.id
 SET
-    status = ?,
-    updated_at = NOW()
-WHERE id = ?;
+    tasks.status = ?
+WHERE user_tasks.user_id = ? AND tasks.id = ?;
+
+-- name: TaskUpdate :exec
+UPDATE
+    tasks
+JOIN user_tasks ON user_tasks.task_id = tasks.id
+SET
+    tasks.title = ?,
+    tasks.description = ?,
+    tasks.status = ?
+WHERE user_tasks.user_id = ? AND tasks.id = ?;

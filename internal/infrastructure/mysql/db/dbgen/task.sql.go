@@ -63,14 +63,31 @@ func (q *Queries) TaskFindAll(ctx context.Context, userID string) ([]TaskFindAll
 
 const taskFindById = `-- name: TaskFindById :one
 SELECT
-    id, title, description, status, created_at, updated_at
+    id, title, description, status, created_at, updated_at, user_id, task_id
 FROM tasks
-WHERE id = ?
+JOIN user_tasks ON user_tasks.task_id = tasks.id
+WHERE user_tasks.user_id = ? AND tasks.id = ?
 `
 
-func (q *Queries) TaskFindById(ctx context.Context, id string) (Task, error) {
-	row := q.db.QueryRowContext(ctx, taskFindById, id)
-	var i Task
+type TaskFindByIdParams struct {
+	UserID string `json:"user_id"`
+	ID     string `json:"id"`
+}
+
+type TaskFindByIdRow struct {
+	ID          string       `json:"id"`
+	Title       string       `json:"title"`
+	Description string       `json:"description"`
+	Status      TasksStatus  `json:"status"`
+	CreatedAt   sql.NullTime `json:"created_at"`
+	UpdatedAt   sql.NullTime `json:"updated_at"`
+	UserID      string       `json:"user_id"`
+	TaskID      string       `json:"task_id"`
+}
+
+func (q *Queries) TaskFindById(ctx context.Context, arg TaskFindByIdParams) (TaskFindByIdRow, error) {
+	row := q.db.QueryRowContext(ctx, taskFindById, arg.UserID, arg.ID)
+	var i TaskFindByIdRow
 	err := row.Scan(
 		&i.ID,
 		&i.Title,
@@ -78,6 +95,8 @@ func (q *Queries) TaskFindById(ctx context.Context, id string) (Task, error) {
 		&i.Status,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.UserID,
+		&i.TaskID,
 	)
 	return i, err
 }
@@ -175,21 +194,52 @@ func (q *Queries) TaskInsert(ctx context.Context, arg TaskInsertParams) error {
 	return err
 }
 
+const taskUpdate = `-- name: TaskUpdate :exec
+UPDATE
+    tasks
+JOIN user_tasks ON user_tasks.task_id = tasks.id
+SET
+    tasks.title = ?,
+    tasks.description = ?,
+    tasks.status = ?
+WHERE user_tasks.user_id = ? AND tasks.id = ?
+`
+
+type TaskUpdateParams struct {
+	Title       string      `json:"title"`
+	Description string      `json:"description"`
+	Status      TasksStatus `json:"status"`
+	UserID      string      `json:"user_id"`
+	ID          string      `json:"id"`
+}
+
+func (q *Queries) TaskUpdate(ctx context.Context, arg TaskUpdateParams) error {
+	_, err := q.db.ExecContext(ctx, taskUpdate,
+		arg.Title,
+		arg.Description,
+		arg.Status,
+		arg.UserID,
+		arg.ID,
+	)
+	return err
+}
+
 const taskUpdateStatus = `-- name: TaskUpdateStatus :exec
 UPDATE
     tasks
+JOIN user_tasks ON user_tasks.task_id = tasks.id
 SET
-    status = ?,
-    updated_at = NOW()
-WHERE id = ?
+    tasks.status = ?
+WHERE user_tasks.user_id = ? AND tasks.id = ?
 `
 
 type TaskUpdateStatusParams struct {
 	Status TasksStatus `json:"status"`
+	UserID string      `json:"user_id"`
 	ID     string      `json:"id"`
 }
 
 func (q *Queries) TaskUpdateStatus(ctx context.Context, arg TaskUpdateStatusParams) error {
-	_, err := q.db.ExecContext(ctx, taskUpdateStatus, arg.Status, arg.ID)
+	_, err := q.db.ExecContext(ctx, taskUpdateStatus, arg.Status, arg.UserID, arg.ID)
 	return err
 }
