@@ -5,6 +5,12 @@ FROM tasks
 JOIN user_tasks ON user_tasks.task_id = tasks.id
 WHERE user_tasks.user_id = ?;
 
+-- name: TaskFindById :one
+SELECT
+    *
+FROM tasks
+WHERE id = ?;
+
 -- name: TaskFindByStatus :many
 SELECT
     *

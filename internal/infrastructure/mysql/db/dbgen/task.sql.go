@@ -61,6 +61,27 @@ func (q *Queries) TaskFindAll(ctx context.Context, userID string) ([]TaskFindAll
 	return items, nil
 }
 
+const taskFindById = `-- name: TaskFindById :one
+SELECT
+    id, title, description, status, created_at, updated_at
+FROM tasks
+WHERE id = ?
+`
+
+func (q *Queries) TaskFindById(ctx context.Context, id string) (Task, error) {
+	row := q.db.QueryRowContext(ctx, taskFindById, id)
+	var i Task
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Description,
+		&i.Status,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const taskFindByStatus = `-- name: TaskFindByStatus :many
 SELECT
     id, title, description, status, created_at, updated_at, user_id, task_id

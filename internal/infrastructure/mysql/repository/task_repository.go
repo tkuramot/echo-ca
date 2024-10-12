@@ -35,6 +35,24 @@ func (r *taskRepository) FindAll(ctx context.Context, userID string) ([]*task.Ta
 	return tasks, nil
 }
 
+func (r *taskRepository) FindByID(ctx context.Context, taskID string) (*task.Task, error) {
+	query := db.GetQuery(ctx)
+	t, err := query.TaskFindById(ctx, taskID)
+	if err != nil {
+		return nil, err
+	}
+	td, err := task.Reconstruct(
+		t.ID,
+		t.Title,
+		t.Description,
+		task.Status(t.Status),
+	)
+	if err != nil {
+		return nil, err
+	}
+	return td, nil
+}
+
 func (r *taskRepository) FindByStatus(ctx context.Context, userID string, status task.Status) ([]*task.Task, error) {
 	query := db.GetQuery(ctx)
 	ts, err := query.TaskFindByStatus(ctx, dbgen.TaskFindByStatusParams{

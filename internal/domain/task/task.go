@@ -9,11 +9,18 @@ import (
 type Status string
 
 const (
-	NotStarted = "not_started"
-	InProgress = "in_progress"
-	Done       = "done"
-	OnHold     = "on_hold"
-	Cancelled  = "canceled"
+	NotStarted Status = "not_started"
+	InProgress Status = "in_progress"
+	Done       Status = "done"
+	OnHold     Status = "on_hold"
+	Cancelled  Status = "canceled"
+)
+
+var (
+	ErrInvalidStatus = errDomain.NewError(
+		errDomain.InvalidArgument,
+		"無効なステータスです",
+	)
 )
 
 type Task struct {
@@ -52,11 +59,8 @@ func newTask(id, title, description string, status Status) (*Task, error) {
 		)
 	}
 
-	if status != NotStarted && status != InProgress && status != Done && status != OnHold && status != Cancelled {
-		return nil, errDomain.NewError(
-			errDomain.InvalidArgument,
-			"無効なステータスです",
-		)
+	if !IsValidStatus(status) {
+		return nil, ErrInvalidStatus
 	}
 
 	return &Task{
@@ -81,4 +85,8 @@ func (t *Task) Description() string {
 
 func (t *Task) Status() Status {
 	return t.status
+}
+
+func IsValidStatus(status Status) bool {
+	return status == NotStarted || status == InProgress || status == Done || status == OnHold || status == Cancelled
 }

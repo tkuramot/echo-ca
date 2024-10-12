@@ -39,6 +39,10 @@ func ReturnStatusCreated[T any](c echo.Context, body T) error {
 	return c.JSON(http.StatusCreated, &body)
 }
 
+func ReturnStatusNoContent(c echo.Context) error {
+	return c.NoContent(http.StatusNoContent)
+}
+
 func ReturnStatusBadRequest(c echo.Context, err error) error {
 	return c.JSON(http.StatusBadRequest, ErrorResponse{
 		Error: err.Error(),
