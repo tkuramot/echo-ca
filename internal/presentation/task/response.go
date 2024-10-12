@@ -2,6 +2,10 @@ package task
 
 import taskDomain "github/tkuramot/echo-practice/internal/domain/task"
 
+type findAllTasksResponse struct {
+	Tasks []taskResponseModel `json:"tasks"`
+}
+
 type saveTaskResponse struct {
 	Task taskResponseModel `json:"task"`
 }

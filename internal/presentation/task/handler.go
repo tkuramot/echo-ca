@@ -8,15 +8,44 @@ import (
 )
 
 type Handler struct {
-	saveTaskUseCase *taskApp.SaveTaskUseCase
+	findAllTasksUseCase *taskApp.FindAllTasksUseCase
+	saveTaskUseCase     *taskApp.SaveTaskUseCase
 }
 
 func NewHandler(
+	findAllTasksUseCase *taskApp.FindAllTasksUseCase,
 	saveTaskUseCase *taskApp.SaveTaskUseCase,
 ) *Handler {
 	return &Handler{
-		saveTaskUseCase: saveTaskUseCase,
+		findAllTasksUseCase: findAllTasksUseCase,
+		saveTaskUseCase:     saveTaskUseCase,
 	}
+}
+
+func (h *Handler) FindAllTasks(c echo.Context) error {
+	ctx := c.Request().Context()
+	sessionRepo := echoRepo.NewSessionRepository(c)
+	userID, err := sessionRepo.UserID()
+	if err != nil {
+		return settings.ReturnStatusInternalServerError(c, err)
+	}
+	ts, err := h.findAllTasksUseCase.Run(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	var tasks []taskResponseModel
+	for _, t := range ts {
+		tasks = append(tasks, taskResponseModel{
+			ID:          t.ID,
+			Title:       t.Title,
+			Description: t.Description,
+			Status:      t.Status,
+		})
+	}
+	return settings.ReturnStatusOK(c, findAllTasksResponse{
+		Tasks: tasks,
+	})
 }
 
 func (h *Handler) SaveTask(c echo.Context) error {

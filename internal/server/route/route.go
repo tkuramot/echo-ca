@@ -77,8 +77,10 @@ func protectedUserRoute(g *echo.Group) {
 func protectedTaskRoute(g *echo.Group) {
 	taskRepo := repository.NewTaskRepository()
 	h := taskPre.NewHandler(
+		taskApp.NewFindAllTasksUseCase(taskRepo),
 		taskApp.NewSaveTaskUseCase(taskRepo),
 	)
 	group := g.Group("/tasks")
+	group.GET("", h.FindAllTasks)
 	group.POST("", h.SaveTask)
 }
