@@ -9,7 +9,7 @@ import (
 )
 
 type Querier interface {
-	TaskFindAll(ctx context.Context, userID string) ([]TaskFindAllRow, error)
+	TaskFindAll(ctx context.Context, arg TaskFindAllParams) ([]TaskFindAllRow, error)
 	TaskFindById(ctx context.Context, arg TaskFindByIdParams) (TaskFindByIdRow, error)
 	TaskFindByStatus(ctx context.Context, arg TaskFindByStatusParams) ([]TaskFindByStatusRow, error)
 	TaskInsert(ctx context.Context, arg TaskInsertParams) error

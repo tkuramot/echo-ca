@@ -45,6 +45,13 @@ func NewTask(title, description string) (*Task, error) {
 }
 
 func newTask(id, title, description string, status Status) (*Task, error) {
+	if id == "" {
+		return nil, errDomain.NewError(
+			errDomain.InvalidArgument,
+			"IDは必須です",
+		)
+	}
+
 	if utf8.RuneCountInString(title) < titleLengthMin || utf8.RuneCountInString(title) > titleLengthMax {
 		return nil, errDomain.NewError(
 			errDomain.InvalidArgument,

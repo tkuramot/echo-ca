@@ -2,7 +2,9 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"github/tkuramot/echo-practice/internal/domain/task"
+	taskDomain "github/tkuramot/echo-practice/internal/domain/task"
 	"github/tkuramot/echo-practice/internal/infrastructure/mysql/db"
 	"github/tkuramot/echo-practice/internal/infrastructure/mysql/db/dbgen"
 )
@@ -13,9 +15,18 @@ func NewTaskRepository() task.Repository {
 	return &taskRepository{}
 }
 
-func (r *taskRepository) FindAll(ctx context.Context, userID string) ([]*task.Task, error) {
+func (r *taskRepository) FindAll(ctx context.Context, filter taskDomain.Filter) ([]*task.Task, error) {
 	query := db.GetQuery(ctx)
-	ts, err := query.TaskFindAll(ctx, userID)
+	ts, err := query.TaskFindAll(ctx, dbgen.TaskFindAllParams{
+		UserID: sql.NullString{
+			String: filter.UserID,
+			Valid:  filter.UserID != "",
+		},
+		TaskStatus: dbgen.NullTasksStatus{
+			TasksStatus: dbgen.TasksStatus(filter.Status),
+			Valid:       filter.Status != "",
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -33,27 +44,6 @@ func (r *taskRepository) FindAll(ctx context.Context, userID string) ([]*task.Ta
 		tasks = append(tasks, td)
 	}
 	return tasks, nil
-}
-
-func (r *taskRepository) FindByID(ctx context.Context, userID, taskID string) (*task.Task, error) {
-	query := db.GetQuery(ctx)
-	t, err := query.TaskFindById(ctx, dbgen.TaskFindByIdParams{
-		UserID: userID,
-		ID:     taskID,
-	})
-	if err != nil {
-		return nil, err
-	}
-	td, err := task.Reconstruct(
-		t.ID,
-		t.Title,
-		t.Description,
-		task.Status(t.Status),
-	)
-	if err != nil {
-		return nil, err
-	}
-	return td, nil
 }
 
 func (r *taskRepository) FindByStatus(ctx context.Context, userID string, status task.Status) ([]*task.Task, error) {

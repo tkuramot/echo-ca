@@ -17,6 +17,11 @@ func NewFindAllTasksUseCase(
 	}
 }
 
+type FindAllTasksUseCaseInputDto struct {
+	UserID string
+	Status taskDomain.Status
+}
+
 type FindAllTasksUseCaseOutputDto struct {
 	ID          string
 	Title       string
@@ -24,8 +29,11 @@ type FindAllTasksUseCaseOutputDto struct {
 	Status      taskDomain.Status
 }
 
-func (uc *FindAllTasksUseCase) Run(ctx context.Context, userID string) ([]*FindAllTasksUseCaseOutputDto, error) {
-	ts, err := uc.taskRepo.FindAll(ctx, userID)
+func (uc *FindAllTasksUseCase) Run(ctx context.Context, dto FindAllTasksUseCaseInputDto) ([]*FindAllTasksUseCaseOutputDto, error) {
+	ts, err := uc.taskRepo.FindAll(ctx, taskDomain.Filter{
+		UserID: dto.UserID,
+		Status: dto.Status,
+	})
 	if err != nil {
 		return nil, err
 	}

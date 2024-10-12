@@ -18,6 +18,7 @@ func NewUpdateTaskUseCase(
 }
 
 type UpdateTaskUseCaseInputDto struct {
+	ID          string
 	Title       string
 	Description string
 	Status      taskDomain.Status
@@ -33,10 +34,9 @@ type UpdateTaskUseCaseOutputDto struct {
 func (uc *UpdateTaskUseCase) Run(
 	ctx context.Context,
 	userID string,
-	taskID string,
 	dto UpdateTaskUseCaseInputDto,
 ) (*UpdateTaskUseCaseOutputDto, error) {
-	t, err := taskDomain.Reconstruct(taskID, dto.Title, dto.Description, dto.Status)
+	t, err := taskDomain.Reconstruct(dto.ID, dto.Title, dto.Description, dto.Status)
 	if err != nil {
 		return nil, err
 	}

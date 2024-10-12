@@ -26,10 +26,10 @@ func TestFindAllTasksUseCase_Run(t *testing.T) {
 				mockRepo.
 					EXPECT().
 					FindAll(gomock.Any(), gomock.Any()).
-					DoAndReturn(func(ctx context.Context, userID string) ([]*taskDomain.Task, error) {
+					DoAndReturn(func(ctx context.Context, filter taskDomain.Filter) ([]*taskDomain.Task, error) {
 						return []*taskDomain.Task{
-							reconstructTask("test1", "test1"),
-							reconstructTask("test2", "test2"),
+							reconstructTask("taskID1", "test1", "test1", taskDomain.NotStarted),
+							reconstructTask("taskID2", "test2", "test2", taskDomain.NotStarted),
 						}, nil
 					})
 			},
@@ -52,7 +52,7 @@ func TestFindAllTasksUseCase_Run(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mockFunc()
-			got, err := uc.Run(context.Background(), "whatever")
+			got, err := uc.Run(context.Background(), FindAllTasksUseCaseInputDto{})
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FindAllTasksUseCase.Run() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -71,7 +71,7 @@ func TestFindAllTasksUseCase_Run(t *testing.T) {
 	}
 }
 
-func reconstructTask(title, description string) *taskDomain.Task {
-	t, _ := taskDomain.NewTask(title, description)
+func reconstructTask(id, title, description string, status taskDomain.Status) *taskDomain.Task {
+	t, _ := taskDomain.Reconstruct(id, title, description, status)
 	return t
 }

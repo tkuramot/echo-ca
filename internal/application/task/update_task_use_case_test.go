@@ -29,7 +29,7 @@ func TestUpdateTaskUseCase_Run(t *testing.T) {
 		{
 			name: "success",
 			args: args{
-				ID:          "id",
+				ID:          "taskID",
 				Title:       "title",
 				Description: "description",
 				Status:      taskDomain.InProgress,
@@ -62,7 +62,8 @@ func TestUpdateTaskUseCase_Run(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mockFunc()
-			got, err := uc.Run(context.Background(), "userID", "taskID", UpdateTaskUseCaseInputDto{
+			got, err := uc.Run(context.Background(), "userID", UpdateTaskUseCaseInputDto{
+				ID:          tt.args.ID,
 				Title:       tt.args.Title,
 				Description: tt.args.Description,
 				Status:      tt.args.Status,

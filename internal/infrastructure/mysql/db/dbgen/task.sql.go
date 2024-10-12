@@ -15,8 +15,14 @@ SELECT
     id, title, description, status, created_at, updated_at, user_id, task_id
 FROM tasks
 JOIN user_tasks ON user_tasks.task_id = tasks.id
-WHERE user_tasks.user_id = ?
+WHERE (? IS NULL OR user_tasks.user_id = ?) AND
+      (? IS NULL OR tasks.status = ?)
 `
+
+type TaskFindAllParams struct {
+	UserID     sql.NullString  `json:"user_id"`
+	TaskStatus NullTasksStatus `json:"task_status"`
+}
 
 type TaskFindAllRow struct {
 	ID          string       `json:"id"`
@@ -29,8 +35,13 @@ type TaskFindAllRow struct {
 	TaskID      string       `json:"task_id"`
 }
 
-func (q *Queries) TaskFindAll(ctx context.Context, userID string) ([]TaskFindAllRow, error) {
-	rows, err := q.db.QueryContext(ctx, taskFindAll, userID)
+func (q *Queries) TaskFindAll(ctx context.Context, arg TaskFindAllParams) ([]TaskFindAllRow, error) {
+	rows, err := q.db.QueryContext(ctx, taskFindAll,
+		arg.UserID,
+		arg.UserID,
+		arg.TaskStatus,
+		arg.TaskStatus,
+	)
 	if err != nil {
 		return nil, err
 	}

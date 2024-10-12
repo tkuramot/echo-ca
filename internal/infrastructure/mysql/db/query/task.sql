@@ -3,7 +3,8 @@ SELECT
     *
 FROM tasks
 JOIN user_tasks ON user_tasks.task_id = tasks.id
-WHERE user_tasks.user_id = ?;
+WHERE (sqlc.narg('user_id') IS NULL OR user_tasks.user_id = sqlc.narg('user_id')) AND
+      (sqlc.narg('task_status') IS NULL OR tasks.status = sqlc.narg('task_status'));
 
 -- name: TaskFindById :one
 SELECT

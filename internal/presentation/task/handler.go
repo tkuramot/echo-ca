@@ -31,12 +31,14 @@ func NewHandler(
 
 func (h *Handler) FindAllTasks(c echo.Context) error {
 	ctx := c.Request().Context()
-	sessionRepo := echoRepo.NewSessionRepository(c)
-	userID, err := sessionRepo.UserID()
-	if err != nil {
-		return settings.ReturnStatusInternalServerError(c, err)
+	var params findAllTasksParams
+	if err := c.Bind(&params); err != nil {
+		return settings.ReturnStatusBadRequest(c, err)
 	}
-	ts, err := h.findAllTasksUseCase.Run(ctx, userID)
+	ts, err := h.findAllTasksUseCase.Run(ctx, taskApp.FindAllTasksUseCaseInputDto{
+		UserID: params.UserID,
+		Status: params.Status,
+	})
 	if err != nil {
 		return err
 	}
@@ -62,8 +64,8 @@ func (h *Handler) UpdateTask(c echo.Context) error {
 		return settings.ReturnStatusBadRequest(c, err)
 	}
 
-	taskID := c.Param("id")
 	dto := taskApp.UpdateTaskUseCaseInputDto{
+		ID:          params.TaskID,
 		Title:       params.Title,
 		Description: params.Description,
 		Status:      params.Status,
@@ -73,7 +75,7 @@ func (h *Handler) UpdateTask(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	task, err := h.updateTaskUseCase.Run(ctx, userID, taskID, dto)
+	task, err := h.updateTaskUseCase.Run(ctx, userID, dto)
 	if err != nil {
 		return err
 	}
@@ -95,8 +97,8 @@ func (h *Handler) UpdateTaskStatus(c echo.Context) error {
 		return settings.ReturnStatusBadRequest(c, err)
 	}
 
-	taskID := c.Param("id")
 	dto := taskApp.UpdateTaskStatusUseCaseInputDto{
+		ID:     params.TaskID,
 		Status: taskDomain.Status(params.Status),
 	}
 	sessionRepo := echoRepo.NewSessionRepository(c)
@@ -104,7 +106,7 @@ func (h *Handler) UpdateTaskStatus(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	err = h.updateTaskStatusUseCase.Run(ctx, userID, taskID, dto)
+	err = h.updateTaskStatusUseCase.Run(ctx, userID, dto)
 	if err != nil {
 		return err
 	}
