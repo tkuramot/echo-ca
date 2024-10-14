@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"errors"
 	sessionDomain "github/tkuramot/echo-practice/internal/domain/session"
 	userDomain "github/tkuramot/echo-practice/internal/domain/user"
 )
@@ -32,6 +33,9 @@ func (uc GetCurrentUserUseCase) Run(
 	}
 	user, err := uc.userRepo.FindByID(ctx, userID)
 	if err != nil {
+		if errors.Is(err, userDomain.ErrUserNotFound) {
+			return nil, sessionDomain.ErrInvalidSession
+		}
 		return nil, err
 	}
 	return &GetCurrentUseCaseOutputDto{
