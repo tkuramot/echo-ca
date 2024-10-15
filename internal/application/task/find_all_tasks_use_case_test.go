@@ -37,12 +37,12 @@ func TestFindAllTasksUseCase_Run(t *testing.T) {
 				{
 					Title:       "test1",
 					Description: "test1",
-					Status:      "not_started",
+					Status:      "backlog",
 				},
 				{
 					Title:       "test2",
 					Description: "test2",
-					Status:      "not_started",
+					Status:      "backlog",
 				},
 			},
 			wantErr: false,
