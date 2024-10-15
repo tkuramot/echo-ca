@@ -12,11 +12,10 @@ import (
 
 const taskFindAll = `-- name: TaskFindAll :many
 SELECT
-    id, title, description, status, created_at, updated_at, user_id, task_id
+    id, title, description, status, created_at, updated_at, user_id
 FROM tasks
-JOIN user_tasks ON user_tasks.task_id = tasks.id
-WHERE (? IS NULL OR user_tasks.user_id = ?) AND
-      (? IS NULL OR tasks.status = ?)
+WHERE (? IS NULL OR user_id = ?) AND
+      (? IS NULL OR status = ?)
 `
 
 type TaskFindAllParams struct {
@@ -24,18 +23,7 @@ type TaskFindAllParams struct {
 	TaskStatus NullTasksStatus `json:"task_status"`
 }
 
-type TaskFindAllRow struct {
-	ID          string       `json:"id"`
-	Title       string       `json:"title"`
-	Description string       `json:"description"`
-	Status      TasksStatus  `json:"status"`
-	CreatedAt   sql.NullTime `json:"created_at"`
-	UpdatedAt   sql.NullTime `json:"updated_at"`
-	UserID      string       `json:"user_id"`
-	TaskID      string       `json:"task_id"`
-}
-
-func (q *Queries) TaskFindAll(ctx context.Context, arg TaskFindAllParams) ([]TaskFindAllRow, error) {
+func (q *Queries) TaskFindAll(ctx context.Context, arg TaskFindAllParams) ([]Task, error) {
 	rows, err := q.db.QueryContext(ctx, taskFindAll,
 		arg.UserID,
 		arg.UserID,
@@ -46,9 +34,9 @@ func (q *Queries) TaskFindAll(ctx context.Context, arg TaskFindAllParams) ([]Tas
 		return nil, err
 	}
 	defer rows.Close()
-	items := []TaskFindAllRow{}
+	items := []Task{}
 	for rows.Next() {
-		var i TaskFindAllRow
+		var i Task
 		if err := rows.Scan(
 			&i.ID,
 			&i.Title,
@@ -57,7 +45,6 @@ func (q *Queries) TaskFindAll(ctx context.Context, arg TaskFindAllParams) ([]Tas
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.UserID,
-			&i.TaskID,
 		); err != nil {
 			return nil, err
 		}
@@ -74,10 +61,9 @@ func (q *Queries) TaskFindAll(ctx context.Context, arg TaskFindAllParams) ([]Tas
 
 const taskFindById = `-- name: TaskFindById :one
 SELECT
-    id, title, description, status, created_at, updated_at, user_id, task_id
+    id, title, description, status, created_at, updated_at, user_id
 FROM tasks
-JOIN user_tasks ON user_tasks.task_id = tasks.id
-WHERE user_tasks.user_id = ? AND tasks.id = ?
+WHERE user_id = ? AND id = ?
 `
 
 type TaskFindByIdParams struct {
@@ -85,20 +71,9 @@ type TaskFindByIdParams struct {
 	ID     string `json:"id"`
 }
 
-type TaskFindByIdRow struct {
-	ID          string       `json:"id"`
-	Title       string       `json:"title"`
-	Description string       `json:"description"`
-	Status      TasksStatus  `json:"status"`
-	CreatedAt   sql.NullTime `json:"created_at"`
-	UpdatedAt   sql.NullTime `json:"updated_at"`
-	UserID      string       `json:"user_id"`
-	TaskID      string       `json:"task_id"`
-}
-
-func (q *Queries) TaskFindById(ctx context.Context, arg TaskFindByIdParams) (TaskFindByIdRow, error) {
+func (q *Queries) TaskFindById(ctx context.Context, arg TaskFindByIdParams) (Task, error) {
 	row := q.db.QueryRowContext(ctx, taskFindById, arg.UserID, arg.ID)
-	var i TaskFindByIdRow
+	var i Task
 	err := row.Scan(
 		&i.ID,
 		&i.Title,
@@ -107,17 +82,15 @@ func (q *Queries) TaskFindById(ctx context.Context, arg TaskFindByIdParams) (Tas
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.UserID,
-		&i.TaskID,
 	)
 	return i, err
 }
 
 const taskFindByStatus = `-- name: TaskFindByStatus :many
 SELECT
-    id, title, description, status, created_at, updated_at, user_id, task_id
+    id, title, description, status, created_at, updated_at, user_id
 FROM tasks
-JOIN user_tasks ON user_tasks.task_id = tasks.id
-WHERE user_tasks.user_id = ? AND tasks.status = ?
+WHERE user_id = ? AND status = ?
 `
 
 type TaskFindByStatusParams struct {
@@ -125,26 +98,15 @@ type TaskFindByStatusParams struct {
 	Status TasksStatus `json:"status"`
 }
 
-type TaskFindByStatusRow struct {
-	ID          string       `json:"id"`
-	Title       string       `json:"title"`
-	Description string       `json:"description"`
-	Status      TasksStatus  `json:"status"`
-	CreatedAt   sql.NullTime `json:"created_at"`
-	UpdatedAt   sql.NullTime `json:"updated_at"`
-	UserID      string       `json:"user_id"`
-	TaskID      string       `json:"task_id"`
-}
-
-func (q *Queries) TaskFindByStatus(ctx context.Context, arg TaskFindByStatusParams) ([]TaskFindByStatusRow, error) {
+func (q *Queries) TaskFindByStatus(ctx context.Context, arg TaskFindByStatusParams) ([]Task, error) {
 	rows, err := q.db.QueryContext(ctx, taskFindByStatus, arg.UserID, arg.Status)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []TaskFindByStatusRow{}
+	items := []Task{}
 	for rows.Next() {
-		var i TaskFindByStatusRow
+		var i Task
 		if err := rows.Scan(
 			&i.ID,
 			&i.Title,
@@ -153,7 +115,6 @@ func (q *Queries) TaskFindByStatus(ctx context.Context, arg TaskFindByStatusPara
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.UserID,
-			&i.TaskID,
 		); err != nil {
 			return nil, err
 		}
@@ -208,12 +169,11 @@ func (q *Queries) TaskInsert(ctx context.Context, arg TaskInsertParams) error {
 const taskUpdate = `-- name: TaskUpdate :exec
 UPDATE
     tasks
-JOIN user_tasks ON user_tasks.task_id = tasks.id
 SET
-    tasks.title = ?,
-    tasks.description = ?,
-    tasks.status = ?
-WHERE user_tasks.user_id = ? AND tasks.id = ?
+    title = ?,
+    description = ?,
+    status = ?
+WHERE user_id = ? AND id = ?
 `
 
 type TaskUpdateParams struct {
@@ -238,10 +198,9 @@ func (q *Queries) TaskUpdate(ctx context.Context, arg TaskUpdateParams) error {
 const taskUpdateStatus = `-- name: TaskUpdateStatus :exec
 UPDATE
     tasks
-JOIN user_tasks ON user_tasks.task_id = tasks.id
 SET
-    tasks.status = ?
-WHERE user_tasks.user_id = ? AND tasks.id = ?
+    status = ?
+WHERE user_id = ? AND id = ?
 `
 
 type TaskUpdateStatusParams struct {

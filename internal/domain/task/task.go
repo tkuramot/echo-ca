@@ -9,10 +9,9 @@ import (
 type Status string
 
 const (
-	NotStarted Status = "not_started"
+	Backlog    Status = "backlog"
 	InProgress Status = "in_progress"
 	Done       Status = "done"
-	OnHold     Status = "on_hold"
 	Cancelled  Status = "canceled"
 )
 
@@ -41,7 +40,7 @@ func Reconstruct(id, title, description string, status Status) (*Task, error) {
 }
 
 func NewTask(title, description string) (*Task, error) {
-	return newTask(ulid.NewULID(), title, description, NotStarted)
+	return newTask(ulid.NewULID(), title, description, Backlog)
 }
 
 func newTask(id, title, description string, status Status) (*Task, error) {
@@ -95,5 +94,5 @@ func (t *Task) Status() Status {
 }
 
 func IsValidStatus(status Status) bool {
-	return status == NotStarted || status == InProgress || status == Done || status == OnHold || status == Cancelled
+	return status == Backlog || status == InProgress || status == Done || status == Cancelled
 }

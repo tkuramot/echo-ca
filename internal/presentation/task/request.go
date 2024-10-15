@@ -3,7 +3,7 @@ package task
 import taskDomain "github/tkuramot/echo-practice/internal/domain/task"
 
 type findAllTasksParams struct {
-	UserID string            `query:"user_id"`
+	UserID string            `query:"userID"`
 	Status taskDomain.Status `query:"status"`
 }
 

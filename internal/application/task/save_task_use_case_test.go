@@ -37,7 +37,7 @@ func TestSaveTaskUseCase_Run(t *testing.T) {
 				ID:          "whatever",
 				Title:       "test",
 				Description: "test",
-				Status:      taskDomain.NotStarted,
+				Status:      taskDomain.Backlog,
 			},
 			wantErr: false,
 		},

@@ -9,9 +9,9 @@ import (
 )
 
 type Querier interface {
-	TaskFindAll(ctx context.Context, arg TaskFindAllParams) ([]TaskFindAllRow, error)
-	TaskFindById(ctx context.Context, arg TaskFindByIdParams) (TaskFindByIdRow, error)
-	TaskFindByStatus(ctx context.Context, arg TaskFindByStatusParams) ([]TaskFindByStatusRow, error)
+	TaskFindAll(ctx context.Context, arg TaskFindAllParams) ([]Task, error)
+	TaskFindById(ctx context.Context, arg TaskFindByIdParams) (Task, error)
+	TaskFindByStatus(ctx context.Context, arg TaskFindByStatusParams) ([]Task, error)
 	TaskInsert(ctx context.Context, arg TaskInsertParams) error
 	TaskUpdate(ctx context.Context, arg TaskUpdateParams) error
 	TaskUpdateStatus(ctx context.Context, arg TaskUpdateStatusParams) error
@@ -19,7 +19,6 @@ type Querier interface {
 	UserFindByEmail(ctx context.Context, email string) (User, error)
 	UserFindById(ctx context.Context, id string) (User, error)
 	UserInsert(ctx context.Context, arg UserInsertParams) error
-	UserTaskInsert(ctx context.Context, arg UserTaskInsertParams) error
 	UserUpsert(ctx context.Context, arg UserUpsertParams) error
 }
 

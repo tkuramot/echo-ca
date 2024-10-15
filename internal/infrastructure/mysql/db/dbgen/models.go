@@ -14,10 +14,9 @@ import (
 type TasksStatus string
 
 const (
-	TasksStatusNotStarted TasksStatus = "not_started"
+	TasksStatusBacklog    TasksStatus = "backlog"
 	TasksStatusInProgress TasksStatus = "in_progress"
 	TasksStatusDone       TasksStatus = "done"
-	TasksStatusOnHold     TasksStatus = "on_hold"
 	TasksStatusCanceled   TasksStatus = "canceled"
 )
 
@@ -63,6 +62,7 @@ type Task struct {
 	Status      TasksStatus  `json:"status"`
 	CreatedAt   sql.NullTime `json:"created_at"`
 	UpdatedAt   sql.NullTime `json:"updated_at"`
+	UserID      string       `json:"user_id"`
 }
 
 type User struct {
@@ -72,9 +72,4 @@ type User struct {
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 	PasswordDigest string    `json:"password_digest"`
-}
-
-type UserTask struct {
-	UserID string `json:"user_id"`
-	TaskID string `json:"task_id"`
 }

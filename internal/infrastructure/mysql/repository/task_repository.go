@@ -82,13 +82,6 @@ func (r *taskRepository) Save(ctx context.Context, userID string, t *task.Task) 
 	if err != nil {
 		return err
 	}
-	err = query.UserTaskInsert(ctx, dbgen.UserTaskInsertParams{
-		UserID: userID,
-		TaskID: t.ID(),
-	})
-	if err != nil {
-		return err
-	}
 	return err
 }
 

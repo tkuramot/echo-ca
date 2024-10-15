@@ -2,23 +2,20 @@
 SELECT
     *
 FROM tasks
-JOIN user_tasks ON user_tasks.task_id = tasks.id
-WHERE (sqlc.narg('user_id') IS NULL OR user_tasks.user_id = sqlc.narg('user_id')) AND
-      (sqlc.narg('task_status') IS NULL OR tasks.status = sqlc.narg('task_status'));
+WHERE (sqlc.narg('user_id') IS NULL OR user_id = sqlc.narg('user_id')) AND
+      (sqlc.narg('task_status') IS NULL OR status = sqlc.narg('task_status'));
 
 -- name: TaskFindById :one
 SELECT
     *
 FROM tasks
-JOIN user_tasks ON user_tasks.task_id = tasks.id
-WHERE user_tasks.user_id = ? AND tasks.id = ?;
+WHERE user_id = ? AND id = ?;
 
 -- name: TaskFindByStatus :many
 SELECT
     *
 FROM tasks
-JOIN user_tasks ON user_tasks.task_id = tasks.id
-WHERE user_tasks.user_id = ? AND tasks.status = ?;
+WHERE user_id = ? AND status = ?;
 
 -- name: TaskInsert :exec
 INSERT INTO
@@ -42,17 +39,15 @@ VALUES (
 -- name: TaskUpdateStatus :exec
 UPDATE
     tasks
-JOIN user_tasks ON user_tasks.task_id = tasks.id
 SET
-    tasks.status = ?
-WHERE user_tasks.user_id = ? AND tasks.id = ?;
+    status = ?
+WHERE user_id = ? AND id = ?;
 
 -- name: TaskUpdate :exec
 UPDATE
     tasks
-JOIN user_tasks ON user_tasks.task_id = tasks.id
 SET
-    tasks.title = ?,
-    tasks.description = ?,
-    tasks.status = ?
-WHERE user_tasks.user_id = ? AND tasks.id = ?;
+    title = ?,
+    description = ?,
+    status = ?
+WHERE user_id = ? AND id = ?;

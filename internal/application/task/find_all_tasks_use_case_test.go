@@ -28,8 +28,8 @@ func TestFindAllTasksUseCase_Run(t *testing.T) {
 					FindAll(gomock.Any(), gomock.Any()).
 					DoAndReturn(func(ctx context.Context, filter taskDomain.Filter) ([]*taskDomain.Task, error) {
 						return []*taskDomain.Task{
-							reconstructTask("taskID1", "test1", "test1", taskDomain.NotStarted),
-							reconstructTask("taskID2", "test2", "test2", taskDomain.NotStarted),
+							reconstructTask("taskID1", "test1", "test1", taskDomain.Backlog),
+							reconstructTask("taskID2", "test2", "test2", taskDomain.Backlog),
 						}, nil
 					})
 			},
