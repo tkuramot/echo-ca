@@ -6,6 +6,7 @@ type Code int
 
 const (
 	InvalidArgument Code = iota
+	Internal
 	NotFound
 	Unauthorized
 )

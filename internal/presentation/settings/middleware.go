@@ -3,6 +3,7 @@ package settings
 import (
 	"errors"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/gommon/log"
 	errDomain "github/tkuramot/echo-practice/internal/domain/error"
 	sessionDomain "github/tkuramot/echo-practice/internal/domain/session"
 	echoRepo "github/tkuramot/echo-practice/internal/infrastructure/echo/repository"
@@ -14,6 +15,8 @@ func errorMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		if err == nil {
 			return nil
 		}
+
+		log.Error(err)
 
 		var domainErr *errDomain.Error
 		if errors.As(err, &domainErr) {
@@ -33,7 +36,7 @@ func errorMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 				return ReturnStatusNotFound(c, errDomain.ErrNotFound)
 			}
 		}
-		return ReturnStatusInternalServerError(c, err)
+		return ReturnStatusInternalServerError(c, errDomain.NewError(errDomain.Internal, "サーバーでエラーが発生しました"))
 	}
 }
 
