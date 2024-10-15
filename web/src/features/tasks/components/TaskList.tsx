@@ -28,6 +28,7 @@ export const TaskList = () => {
         <TableRow>
           <TableHead className="w-[100px]">タイトル</TableHead>
           <TableHead>説明</TableHead>
+          <TableHead>ステータス</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -35,6 +36,7 @@ export const TaskList = () => {
           <TableRow key={task.id}>
             <TableCell>{task.title}</TableCell>
             <TableCell>{task.description}</TableCell>
+            <TableCell>{task.status}</TableCell>
           </TableRow>
         ))}
       </TableBody>
