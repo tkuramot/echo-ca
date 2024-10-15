@@ -24,6 +24,7 @@ INSERT INTO
     title,
     description,
     status,
+    user_id,
     created_at,
     updated_at
 )
@@ -32,6 +33,7 @@ VALUES (
     sqlc.arg(title),
     sqlc.arg(description),
     sqlc.arg(status),
+    sqlc.arg(user_id),
     NOW(),
     NOW()
 );

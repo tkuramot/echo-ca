@@ -28,7 +28,7 @@ func NewEcho() *echo.Echo {
 }
 
 type ErrorResponse struct {
-	Error string `json:"error"`
+	Message string `json:"message"`
 }
 
 func ReturnStatusOK[T any](c echo.Context, body T) error {
@@ -45,30 +45,30 @@ func ReturnStatusNoContent(c echo.Context) error {
 
 func ReturnStatusBadRequest(c echo.Context, err error) error {
 	return c.JSON(http.StatusBadRequest, ErrorResponse{
-		Error: err.Error(),
+		Message: err.Error(),
 	})
 }
 
 func ReturnStatusUnauthorized(c echo.Context, err error) error {
 	return c.JSON(http.StatusUnauthorized, ErrorResponse{
-		Error: err.Error(),
+		Message: err.Error(),
 	})
 }
 
 func ReturnStatusForbidden(c echo.Context, err error) error {
 	return c.JSON(http.StatusForbidden, ErrorResponse{
-		Error: err.Error(),
+		Message: err.Error(),
 	})
 }
 
 func ReturnStatusNotFound(c echo.Context, err error) error {
 	return c.JSON(http.StatusNotFound, ErrorResponse{
-		Error: err.Error(),
+		Message: err.Error(),
 	})
 }
 
 func ReturnStatusInternalServerError(c echo.Context, err error) error {
 	return c.JSON(http.StatusInternalServerError, ErrorResponse{
-		Error: err.Error(),
+		Message: err.Error(),
 	})
 }

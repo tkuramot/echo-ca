@@ -48,6 +48,15 @@ export const createAppRouter = (_: QueryClient) =>
             return { Component: DashboardRoute };
           },
         },
+        {
+          path: "tasks",
+          lazy: async () => {
+            const { TaskListRoute } = await import(
+              "@/app/routes/app/tasks/TaskListRoute"
+            );
+            return { Component: TaskListRoute };
+          },
+        },
       ],
     },
     {

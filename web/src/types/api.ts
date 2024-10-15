@@ -14,3 +14,17 @@ export type User = Entity<{
 export type UserResponse = {
   user: User;
 };
+
+export type Task = Entity<{
+  title: string;
+  description: string;
+  status: "backlog" | "in_progress" | "done" | "canceled";
+}>;
+
+export type TaskListResponse = {
+  tasks: Task[];
+};
+
+export type CreateTaskResponse = {
+  task: Task;
+};

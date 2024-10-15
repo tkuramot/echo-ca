@@ -74,6 +74,7 @@ func (r *taskRepository) FindByStatus(ctx context.Context, userID string, status
 func (r *taskRepository) Save(ctx context.Context, userID string, t *task.Task) error {
 	query := db.GetQuery(ctx)
 	err := query.TaskInsert(ctx, dbgen.TaskInsertParams{
+		UserID:      userID,
 		ID:          t.ID(),
 		Title:       t.Title(),
 		Description: t.Description(),

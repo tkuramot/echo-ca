@@ -136,10 +136,12 @@ INSERT INTO
     title,
     description,
     status,
+    user_id,
     created_at,
     updated_at
 )
 VALUES (
+    ?,
     ?,
     ?,
     ?,
@@ -154,6 +156,7 @@ type TaskInsertParams struct {
 	Title       string      `json:"title"`
 	Description string      `json:"description"`
 	Status      TasksStatus `json:"status"`
+	UserID      string      `json:"user_id"`
 }
 
 func (q *Queries) TaskInsert(ctx context.Context, arg TaskInsertParams) error {
@@ -162,6 +165,7 @@ func (q *Queries) TaskInsert(ctx context.Context, arg TaskInsertParams) error {
 		arg.Title,
 		arg.Description,
 		arg.Status,
+		arg.UserID,
 	)
 	return err
 }
